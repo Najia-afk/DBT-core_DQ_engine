@@ -1,0 +1,848 @@
+{
+ "lane": "etl",
+ "machine": {
+  "date": "2026-11-13T16:18:06+01:00",
+  "os": "Windows-11-10.0.26300-SP0",
+  "cpu_threads": 32,
+  "ram_gb": 63.7,
+  "python": "3.12.10",
+  "duckdb": "2.0.0",
+  "pyarrow": "26.0.1",
+  "psycopg": "3.3.6",
+  "numpy": "2.5.4",
+  "rapidfuzz": "3.14.6",
+  "dbt-core": "1.12.7",
+  "dbt-duckdb": "1.11.1",
+  "docker_server": "29.1.3",
+  "docker_vm_mem_gb": 31.2,
+  "git_head": "90af100"
+ },
+ "phases": {
+  "sequential_host_slots_1": {
+   "summary": {
+    "runs": 3,
+    "all_succeeded": true,
+    "statuses": [
+     "succeeded"
+    ],
+    "wall_s": 36.08,
+    "step_concurrency_max": 1,
+    "run_concurrency_max": 3,
+    "referential_concurrency_max": 3,
+    "same_referential_serialization": [],
+    "step_peak_rss_mib_max": 191,
+    "sum_of_concurrent_step_peaks_mib": 191.0,
+    "label": "seq-baseline",
+    "worker_exit": 0,
+    "worker_wall_s": 36.71,
+    "monitor": {
+     "rss_peak_mb": 259.1,
+     "container_mem_peak_mb": 355.9,
+     "container_cpu_peak_pct": 143.9,
+     "total_peak_mb": 596.7,
+     "host_used_peak_gb": 26.99,
+     "disk_free_min_gb": 66.1,
+     "abort_reason": null,
+     "rss_peak_processes": [
+      {
+       "pid": 45812,
+       "cmd": "-m engine.lanes.etl reconcile",
+       "rss_mb": 202.2
+      },
+      {
+       "pid": 32868,
+       "cmd": "-m engine.runtime --dsn",
+       "rss_mb": 47.5
+      },
+      {
+       "pid": 23116,
+       "cmd": "-m engine.lanes.etl reconcile",
+       "rss_mb": 4.7
+      },
+      {
+       "pid": 32924,
+       "cmd": "-m engine.runtime --dsn",
+       "rss_mb": 4.7
+      }
+     ]
+    },
+    "worker_tree_rss_peak_mib": 259.1,
+    "state_container_mem_peak_mib": 355.9,
+    "meta_container_mem_mib_after": 32.2
+   },
+   "runs": [
+    {
+     "run_id": "run-20261113151822-461ba26b",
+     "referential": "r1",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583104.427452,
+     "ended": 1794583128.244835,
+     "queued": 1794583102.549965
+    },
+    {
+     "run_id": "run-20261113151823-cf3bd824",
+     "referential": "r2",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583105.319678,
+     "ended": 1794583134.343018,
+     "queued": 1794583103.1795
+    },
+    {
+     "run_id": "run-20261113151823-a6bee0d8",
+     "referential": "r3",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583106.15538,
+     "ended": 1794583140.503853,
+     "queued": 1794583103.803283
+    }
+   ],
+   "steps": [
+    {
+     "run_id": "run-20261113151822-461ba26b",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583104.427452,
+     "ended": 1794583105.306571,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151822-461ba26b",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583111.942131,
+     "ended": 1794583113.552026,
+     "peak_rss_mib": 134,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-cf3bd824",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583105.319678,
+     "ended": 1794583106.144513,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-a6bee0d8",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583110.291522,
+     "ended": 1794583111.927518,
+     "peak_rss_mib": 128,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-a6bee0d8",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583106.15538,
+     "ended": 1794583107.022206,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151822-461ba26b",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583107.032697,
+     "ended": 1794583108.658509,
+     "peak_rss_mib": 136,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-cf3bd824",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583108.668997,
+     "ended": 1794583110.281383,
+     "peak_rss_mib": 127,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151822-461ba26b",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583117.286526,
+     "ended": 1794583118.926879,
+     "peak_rss_mib": 136,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-cf3bd824",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583118.936107,
+     "ended": 1794583120.524649,
+     "peak_rss_mib": 130,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-cf3bd824",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583113.561883,
+     "ended": 1794583115.197964,
+     "peak_rss_mib": 137,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-a6bee0d8",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583115.208154,
+     "ended": 1794583116.767966,
+     "peak_rss_mib": 129,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-a6bee0d8",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583120.53501,
+     "ended": 1794583122.096874,
+     "peak_rss_mib": 128,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151822-461ba26b",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583122.106842,
+     "ended": 1794583128.244835,
+     "peak_rss_mib": 191,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-cf3bd824",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583128.257221,
+     "ended": 1794583134.343018,
+     "peak_rss_mib": 185,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151823-a6bee0d8",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583134.35516,
+     "ended": 1794583140.503853,
+     "peak_rss_mib": 188,
+     "attempt": 1
+    }
+   ]
+  },
+  "concurrent_host_slots_3": {
+   "summary": {
+    "runs": 3,
+    "all_succeeded": true,
+    "statuses": [
+     "succeeded"
+    ],
+    "wall_s": 14.84,
+    "step_concurrency_max": 3,
+    "run_concurrency_max": 3,
+    "referential_concurrency_max": 3,
+    "same_referential_serialization": [],
+    "step_peak_rss_mib_max": 194,
+    "sum_of_concurrent_step_peaks_mib": 573.0,
+    "label": "conc-parallel",
+    "worker_exit": 0,
+    "worker_wall_s": 15.46,
+    "monitor": {
+     "rss_peak_mb": 632.0,
+     "container_mem_peak_mb": 461.8,
+     "container_cpu_peak_pct": 201.9,
+     "total_peak_mb": 1093.8,
+     "host_used_peak_gb": 27.84,
+     "disk_free_min_gb": 66.1,
+     "abort_reason": null,
+     "rss_peak_processes": [
+      {
+       "pid": 24844,
+       "cmd": "-m engine.lanes.etl reconcile",
+       "rss_mb": 191.9
+      },
+      {
+       "pid": 43524,
+       "cmd": "-m engine.lanes.etl reconcile",
+       "rss_mb": 189.3
+      },
+      {
+       "pid": 44800,
+       "cmd": "-m engine.lanes.etl reconcile",
+       "rss_mb": 184.6
+      },
+      {
+       "pid": 47580,
+       "cmd": "-m engine.runtime --dsn",
+       "rss_mb": 47.3
+      },
+      {
+       "pid": 41172,
+       "cmd": "-m engine.lanes.etl reconcile",
+       "rss_mb": 4.7
+      }
+     ]
+    },
+    "worker_tree_rss_peak_mib": 632.0,
+    "state_container_mem_peak_mib": 461.8,
+    "meta_container_mem_mib_after": 33.6
+   },
+   "runs": [
+    {
+     "run_id": "run-20261113151904-33fd8e97",
+     "referential": "r1",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583146.90202,
+     "ended": 1794583161.651061,
+     "queued": 1794583144.991994
+    },
+    {
+     "run_id": "run-20261113151905-e39acb13",
+     "referential": "r2",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583146.922892,
+     "ended": 1794583161.738086,
+     "queued": 1794583145.641912
+    },
+    {
+     "run_id": "run-20261113151906-ed11391d",
+     "referential": "r3",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583146.943427,
+     "ended": 1794583161.403685,
+     "queued": 1794583146.279949
+    }
+   ],
+   "steps": [
+    {
+     "run_id": "run-20261113151904-33fd8e97",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583149.659822,
+     "ended": 1794583151.570919,
+     "peak_rss_mib": 135,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151904-33fd8e97",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583147.785098,
+     "ended": 1794583149.652994,
+     "peak_rss_mib": 134,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151904-33fd8e97",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583146.90202,
+     "ended": 1794583147.774148,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151905-e39acb13",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583146.922892,
+     "ended": 1794583147.778236,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151906-ed11391d",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583146.943427,
+     "ended": 1794583147.789121,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151906-ed11391d",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583149.690838,
+     "ended": 1794583151.56217,
+     "peak_rss_mib": 129,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151905-e39acb13",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583147.799258,
+     "ended": 1794583149.649013,
+     "peak_rss_mib": 132,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151906-ed11391d",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583147.814127,
+     "ended": 1794583149.649755,
+     "peak_rss_mib": 129,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151906-ed11391d",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583151.612475,
+     "ended": 1794583153.479583,
+     "peak_rss_mib": 128,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151905-e39acb13",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583149.675964,
+     "ended": 1794583151.579301,
+     "peak_rss_mib": 135,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151906-ed11391d",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583153.491471,
+     "ended": 1794583161.403685,
+     "peak_rss_mib": 190,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151905-e39acb13",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583151.594665,
+     "ended": 1794583153.483481,
+     "peak_rss_mib": 131,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151904-33fd8e97",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583151.580188,
+     "ended": 1794583153.486564,
+     "peak_rss_mib": 132,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151904-33fd8e97",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583153.503199,
+     "ended": 1794583161.651061,
+     "peak_rss_mib": 194,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151905-e39acb13",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583153.516751,
+     "ended": 1794583161.738086,
+     "peak_rss_mib": 189,
+     "attempt": 1
+    }
+   ]
+  },
+  "same_referential": {
+   "summary": {
+    "runs": 3,
+    "all_succeeded": true,
+    "statuses": [
+     "succeeded"
+    ],
+    "wall_s": 7.22,
+    "step_concurrency_max": 3,
+    "run_concurrency_max": 2,
+    "referential_concurrency_max": 2,
+    "same_referential_serialization": [
+     {
+      "referential": "r1",
+      "gap_s": 0.01,
+      "ok": true
+     }
+    ],
+    "step_peak_rss_mib_max": 134,
+    "sum_of_concurrent_step_peaks_mib": 391.0,
+    "label": "ser-same-ref",
+    "worker_exit": 0,
+    "worker_wall_s": 7.86,
+    "monitor": {
+     "rss_peak_mb": 441.3,
+     "container_mem_peak_mb": 340.1,
+     "container_cpu_peak_pct": 49.3,
+     "total_peak_mb": 780.7,
+     "host_used_peak_gb": 27.54,
+     "disk_free_min_gb": 66.1,
+     "abort_reason": null,
+     "rss_peak_processes": [
+      {
+       "pid": 20888,
+       "cmd": "-m engine.lanes.etl ingest",
+       "rss_mb": 126.6
+      },
+      {
+       "pid": 40028,
+       "cmd": "-m engine.lanes.etl ingest",
+       "rss_mb": 126.6
+      },
+      {
+       "pid": 47368,
+       "cmd": "-m engine.lanes.etl ingest",
+       "rss_mb": 122.1
+      },
+      {
+       "pid": 15904,
+       "cmd": "-m engine.runtime --dsn",
+       "rss_mb": 47.2
+      },
+      {
+       "pid": 46788,
+       "cmd": "-m engine.lanes.etl ingest",
+       "rss_mb": 4.7
+      }
+     ]
+    },
+    "worker_tree_rss_peak_mib": 441.3,
+    "state_container_mem_peak_mib": 340.1,
+    "meta_container_mem_mib_after": 34.8
+   },
+   "runs": [
+    {
+     "run_id": "run-20261113151923-d56e4742",
+     "referential": "r1",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583165.574815,
+     "ended": 1794583169.813367,
+     "queued": 1794583163.691401
+    },
+    {
+     "run_id": "run-20261113151924-c213d0d9",
+     "referential": "r1",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583169.826178,
+     "ended": 1794583172.78994,
+     "queued": 1794583164.321371
+    },
+    {
+     "run_id": "run-20261113151924-63106b4b",
+     "referential": "r2",
+     "status": "succeeded",
+     "status_reason": null,
+     "started": 1794583165.595164,
+     "ended": 1794583169.872434,
+     "queued": 1794583164.942494
+    }
+   ],
+   "steps": [
+    {
+     "run_id": "run-20261113151923-d56e4742",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583166.338909,
+     "ended": 1794583167.653027,
+     "peak_rss_mib": 131,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-63106b4b",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583165.595164,
+     "ended": 1794583166.336604,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151923-d56e4742",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583165.574815,
+     "ended": 1794583166.327171,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-63106b4b",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583167.69474,
+     "ended": 1794583168.934335,
+     "peak_rss_mib": 129,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-c213d0d9",
+     "step": "init",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583169.826178,
+     "ended": 1794583170.560369,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151923-d56e4742",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583168.944701,
+     "ended": 1794583169.813367,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-c213d0d9",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583171.917737,
+     "ended": 1794583172.78994,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-63106b4b",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583166.353843,
+     "ended": 1794583167.653059,
+     "peak_rss_mib": 128,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-63106b4b",
+     "step": "reconcile",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583169.002269,
+     "ended": 1794583169.872434,
+     "peak_rss_mib": 0,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151923-d56e4742",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583166.369037,
+     "ended": 1794583167.668452,
+     "peak_rss_mib": 130,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151923-d56e4742",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583167.677327,
+     "ended": 1794583168.934372,
+     "peak_rss_mib": 128,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-63106b4b",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583167.663574,
+     "ended": 1794583168.992317,
+     "peak_rss_mib": 134,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-c213d0d9",
+     "step": "ingest:web",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583170.613125,
+     "ended": 1794583171.858367,
+     "peak_rss_mib": 128,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-c213d0d9",
+     "step": "ingest:crm",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583170.581468,
+     "ended": 1794583171.895337,
+     "peak_rss_mib": 131,
+     "attempt": 1
+    },
+    {
+     "run_id": "run-20261113151924-c213d0d9",
+     "step": "ingest:erp",
+     "status": "succeeded",
+     "error": null,
+     "error_kind": null,
+     "started": 1794583170.594217,
+     "ended": 1794583171.901391,
+     "peak_rss_mib": 131,
+     "attempt": 1
+    }
+   ]
+  }
+ },
+ "counts_seq": {
+  "r1": {
+   "source_record": 38296,
+   "golden": 22573,
+   "match_pair": 22440
+  },
+  "r2": {
+   "source_record": 37969,
+   "golden": 22234,
+   "match_pair": 22466
+  },
+  "r3": {
+   "source_record": 37872,
+   "golden": 22388,
+   "match_pair": 22224
+  }
+ },
+ "counts_conc": {
+  "r1": {
+   "source_record": 38296,
+   "golden": 22573,
+   "match_pair": 22440
+  },
+  "r2": {
+   "source_record": 37969,
+   "golden": 22234,
+   "match_pair": 22466
+  },
+  "r3": {
+   "source_record": 37872,
+   "golden": 22388,
+   "match_pair": 22224
+  }
+ },
+ "summary": {
+  "lane": "etl",
+  "referentials": 3,
+  "nodes": 20000,
+  "attributes": 30,
+  "sequential_wall_s": 36.08,
+  "concurrent_wall_s": 14.84,
+  "speedup": 2.43,
+  "concurrent_step_concurrency_max": 3,
+  "concurrent_run_concurrency_max": 3,
+  "all_succeeded": true,
+  "same_ref_serialization": [
+   {
+    "referential": "r1",
+    "gap_s": 0.01,
+    "ok": true
+   }
+  ],
+  "state_equal_seq_vs_conc": true,
+  "budget_mib": 9216,
+  "profile_process_mib": 3072,
+  "worker_tree_rss_peak_mib_concurrent": 632.0,
+  "sum_of_concurrent_step_peaks_mib": 573.0,
+  "step_peak_rss_mib_max": 194,
+  "state_container_mem_peak_mib": 461.8,
+  "total_peak_mib_concurrent": 1093.8,
+  "within_budget": true,
+  "validated": true
+ }
+}

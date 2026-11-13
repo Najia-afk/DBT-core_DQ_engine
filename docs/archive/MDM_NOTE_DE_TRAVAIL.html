@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture MDM — note au comité</title>
+<style>
+:root{color-scheme:light;--ink:#202a35;--muted:#526171;--line:#cfd7df;--paper:#fff;--bg:#f3f5f7;--blue:#315d7d;--pale:#eef3f6;--warn:#7b5710}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",Arial,sans-serif}
+a{color:#174f78;text-underline-offset:3px}a:focus-visible,summary:focus-visible{outline:3px solid #a47720;outline-offset:3px}
+.wrap{max-width:1080px;padding:22px;margin:auto}header,section{background:var(--paper);border:1px solid var(--line);padding:28px 36px;margin-bottom:14px}
+.meta,.section-id{font-size:.77rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+h1{font-size:clamp(2rem,4vw,2.7rem);line-height:1.15;margin:10px 0 14px;max-width:850px}h2{font-size:1.55rem;line-height:1.25;margin:5px 0 14px}h3{font-size:1.08rem;line-height:1.3;margin:22px 0 7px}
+p{margin:8px 0 14px}.lead{font-size:1.08rem;max-width:900px}.small,figcaption{font-size:.88rem;color:var(--muted)}
+nav{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}nav a{font-size:.88rem;background:#fff;border:1px solid var(--line);padding:6px 9px;text-decoration:none}
+ul,ol{padding-left:22px}li{margin:5px 0}.note,.caution{padding:13px 16px;margin:16px 0;border-left:4px solid var(--blue);background:var(--pale)}.caution{border-color:var(--warn);background:#faf6eb}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);margin:14px 0}table{border-collapse:collapse;width:100%;font-size:.9rem;line-height:1.45;text-align:left}th,td{padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf1f4}tr:last-child td{border-bottom:0}td:first-child{font-weight:650}
+.status{display:inline-block;font-size:.73rem;font-weight:700;letter-spacing:.03em;padding:2px 6px;border:1px solid #b7c4ce;background:#f3f6f8;white-space:nowrap}.status.demo{border-color:#9bb5a7;background:#f0f6f2}.status.target{border-color:#c3b17d;background:#faf7ed}
+.figure{border:1px solid var(--line);padding:14px;margin:16px 0;background:#fff}figure{margin:0}figure img{display:block;width:100%;height:auto;border:1px solid var(--line)}figcaption{margin-top:7px}
+.screens{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0}.screens.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+details{border:1px solid var(--line);padding:9px 12px;margin:9px 0;background:#fff}summary{cursor:pointer;font-weight:650}
+.skip{position:absolute;left:-9999px;background:#fff;padding:10px;z-index:5}.skip:focus{left:10px;top:10px}
+svg{display:block;width:100%;height:auto;font-family:"Segoe UI",Arial,sans-serif}svg text{fill:var(--ink)}svg .node{fill:#fff;stroke:#718494;stroke-width:1.5}svg .gold{fill:#eef3f6;stroke:#315d7d;stroke-width:2}svg .edge{stroke:#657889;stroke-width:2;fill:none}svg .dashed{stroke-dasharray:6 5}svg .label{font-size:14px}svg .small-label{font-size:12px;fill:#526171}
+@media(max-width:720px){.wrap{padding:10px}header,section{padding:22px 18px}.screens,.screens.three{grid-template-columns:1fr}}
+@media print{@page{size:A4;margin:13mm}body{background:#fff;font-size:10pt}.wrap{max-width:none;padding:0}header,section{border:0;border-bottom:1px solid #bbb;padding:6mm 0;break-inside:auto}nav{display:none}.table-wrap{overflow:visible}.table-wrap table{min-width:0;font-size:8.5pt}th,td{padding:6px 7px}.figure,figure,details{break-inside:avoid}.screens{grid-template-columns:repeat(2,1fr)}.screens.three{grid-template-columns:repeat(3,1fr)}details:not([open])>:not(summary){display:block}details summary{list-style:none}a{color:inherit;text-decoration:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#decision">Aller au contenu</a>
+<div class="wrap">
+<header>
+  <div class="meta">Note de travail · 12 novembre 2026</div>
+  <h1>Réconcilier personnes, lieux et relations</h1>
+  <p class="lead">Cette note présente le besoin métier, un scénario de bout en bout et l’état vérifiable du laboratoire. Elle sépare les tranches déjà exécutées des fonctions visées et des sujets qui ne sont pas mesurés. Elle ne constitue ni une décision de choix de plateforme, ni une preuve de capacité de production.</p>
+  <p class="small">Les visualisations ci-dessous sont des SVG intégrés à ce document. Elles n’appellent aucun service, script, police ou bibliothèque distante. Les explications restent disponibles sans JavaScript ; utiliser l’impression du navigateur pour le PDF.</p>
+</header>
+<nav aria-label="Sommaire">
+  <a href="#decision">À retenir</a><a href="#scenario">Cas suivi</a><a href="#gestes">Gestes utilisateurs</a><a href="#voies">Voies techniques</a><a href="#preuves">État des preuves</a><a href="#ihm">Consultation et maquettes</a><a href="#echelle">Échelle et mesures</a><a href="#sources">Sources</a>
+</nav>
+<main>
+<section id="decision">
+  <div class="section-id">1 · Synthèse de décision</div>
+  <h2>Un contrat MDM commun avant de choisir une voie</h2>
+  <p>Le service à construire reçoit des observations de plusieurs sources, contrôle leur qualité, propose des rapprochements justifiables, publie des entités de référence (golden) et conserve les liens, les conflits et l’historique. Une décision de rapprochement n’est pas une simple similarité de texte. Une relation ne doit être publiée que si ses extrémités et ses preuves sont recevables.</p>
+  <div class="note"><strong>État du laboratoire :</strong> trois voies distinctes ont des tranches exécutables et des tests sur des périmètres différents. ETL et ELT passent des projections partielles de l’oracle ; la voie graphe ne passe pas l’oracle commun. Il n’existe pas de résultat d’équivalence de bout en bout, de classement ni de benchmark MDM comparatif.</div>
+  <p>Le jeu local est synthétique, organisé en trois sources et six cycles. Le générateur de volume est partiel ; aucune exécution MDM à dix millions de nœuds ou d’enregistrements n’est documentée. La consultation web observée concerne la voie ETL sur fixture, en lecture seule. La console de stewardship commune, les droits de production et l’intégration des trois voies ne sont pas livrés.</p>
+</section>
+
+<section id="scenario">
+  <div class="section-id">2 · Un même cas, de l’entrée à la publication</div>
+  <h2>Nora Martin, deux lieux et une information contradictoire</h2>
+  <p class="caution"><strong>Exemple pédagogique entièrement fictif.</strong> Les personnes, identifiants, valeurs et événements de ce scénario sont inventés pour expliquer le contrat ; ils ne sont pas un résultat observé sur les fixtures ni une décision de production. Les règles exactes restent à valider avec le métier.</p>
+  <p>Les sources RH A et CRM B décrivent chacune Nora Martin avec une date de naissance concordante. L’annuaire C contient « Nora M. Martin », mais une date de naissance différente. A décrit son emploi au « Campus Nord » ; B emploie le nom « Site Nord » pour le même lieu et documente une ancienne période de travail, puis une reprise. Un dossier de résidence la relie à un autre lieu. Dans les deux premières fiches, le téléphone diffère.</p>
+
+  <div class="figure">
+    <figure>
+      <svg viewBox="0 0 900 190" role="img" aria-labelledby="cycle-title cycle-desc">
+        <title id="cycle-title">Étapes de traitement du cas de Nora Martin</title>
+        <desc id="cycle-desc">Les observations des sources passent par les contrôles de qualité et le rapprochement. Les cas non résolus vont en revue ; les fiches et relations validées forment une publication versionnée.</desc>
+        <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#657889"/></marker></defs>
+        <rect class="node" x="10" y="46" width="160" height="82" rx="4"/><text class="label" x="90" y="72" text-anchor="middle">Observations</text><text class="small-label" x="90" y="96" text-anchor="middle">RH A · CRM B · annuaire C</text><text class="small-label" x="90" y="115" text-anchor="middle">lieux · liens · révisions</text>
+        <path class="edge" marker-end="url(#arrow)" d="M170 87 H205"/>
+        <rect class="node" x="212" y="46" width="150" height="82" rx="4"/><text class="label" x="287" y="72" text-anchor="middle">DQ</text><text class="small-label" x="287" y="96" text-anchor="middle">contrat et dates</text><text class="small-label" x="287" y="115" text-anchor="middle">anomalie tracée</text>
+        <path class="edge" marker-end="url(#arrow)" d="M362 87 H397"/>
+        <rect class="node" x="404" y="46" width="155" height="82" rx="4"/><text class="label" x="481" y="72" text-anchor="middle">Rapprochement</text><text class="small-label" x="481" y="96" text-anchor="middle">candidats + critères</text><text class="small-label" x="481" y="115" text-anchor="middle">contradiction → revue</text>
+        <path class="edge" marker-end="url(#arrow)" d="M559 87 H594"/>
+        <rect class="gold" x="601" y="46" width="135" height="82" rx="4"/><text class="label" x="668" y="72" text-anchor="middle">Golden</text><text class="small-label" x="668" y="96" text-anchor="middle">valeurs et provenance</text><text class="small-label" x="668" y="115" text-anchor="middle">identité stable</text>
+        <path class="edge" marker-end="url(#arrow)" d="M736 87 H771"/>
+        <rect class="node" x="778" y="46" width="112" height="82" rx="4"/><text class="label" x="834" y="72" text-anchor="middle">Relations</text><text class="small-label" x="834" y="96" text-anchor="middle">supports · périodes</text><text class="small-label" x="834" y="115" text-anchor="middle">publication cohérente</text>
+        <path class="edge dashed" d="M481 128 V160 H668 V131"/><text class="small-label" x="574" y="179" text-anchor="middle">doute ou conflit non résolu : ne pas fusionner automatiquement</text>
+      </svg>
+      <figcaption>Lecture : les règles de DQ et de rapprochement encadrent la publication ; les éléments incertains restent visibles et ne sont pas transformés en faits.</figcaption>
+    </figure>
+  </div>
+  <details open>
+    <summary>1. Contrôler les données et leur fraîcheur</summary>
+    <p>Chaque révision garde sa source, sa clé, son contenu et sa provenance. Exemple : une relation dont la date de fin précède la date de début est conservée comme observation et signalée, mais ne sert pas à fabriquer un lien golden. Une source invalide ou indisponible ne signifie pas que ses données ont disparu ; une absence n’est pas une retraite sans snapshot complet autoritatif ou statut explicite.</p>
+    <p>La politique cible permet d’isoler l’objet ou la relation affectée lorsque le contrat le prévoit. C’est une cible à préciser et tester : dans la tranche graphe actuelle, toute anomalie DQ bloque l’ensemble du cycle.</p>
+  </details>
+  <details open>
+    <summary>2. Rapprocher les personnes et les lieux</summary>
+    <p>Les deux fiches Nora de A et B peuvent constituer un candidat commun si la règle versionnée trouve un seul candidat recevable et aucune contradiction bloquante. La fiche C n’est pas fusionnée automatiquement : la date discordante impose une revue, quel que soit le score de similarité. Une ressemblance de nom ou un score élevé n’est pas une preuve d’identité.</p>
+    <p>De même, « Campus Nord » et « Site Nord » ne deviennent un même lieu qu’après application des critères prévus et résolution de l’ambiguïté. Les décisions, seuils et formules mentionnés dans le laboratoire sont expérimentaux et ne sont pas calibrés pour la production.</p>
+  </details>
+  <details open>
+    <summary>3. Construire le golden et représenter les conflits</summary>
+    <p>Si A et B sont rapprochées, un golden personne stable porte ses attributs retenus, la source gagnante, la règle/version et les alternatives. Le téléphone contradictoire ouvre un conflit explicable ; si la règle ne le tranche pas, la dernière valeur publiée peut être conservée en l’identifiant explicitement comme telle, ou l’attribut requis peut empêcher la publication. Le choix dépend du contrat de données ; il n’est pas inventé par le moteur.</p>
+    <p>Le golden lieu et les identifiants source restent traçables. Un doublon source et un doute d’identité sont des sujets distincts : ils peuvent nécessiter des gestes de stewardship différents.</p>
+  </details>
+  <details open>
+    <summary>4. Publier les relations et leurs épisodes</summary>
+    <p>Après validation des personnes et des lieux, les relations <code>WORKS_AT</code> et <code>LIVES_AT</code> sont résolues par leurs extrémités et leurs supports source. Les périodes d’emploi terminées puis reprises sont conservées comme épisodes, pas écrasées en un lien intemporel. Une extrémité absente ou ambiguë met le lien en attente/quarantaine selon le contrat ; elle ne justifie pas un lien inventé.</p>
+  </details>
+  <div class="figure">
+    <figure>
+      <svg viewBox="0 0 700 300" role="img" aria-labelledby="graph-title graph-desc">
+        <title id="graph-title">Petit voisinage de Nora Martin</title>
+        <desc id="graph-desc">Le golden Nora Martin est relié au Campus Nord par deux épisodes de travail, à une résidence par un lien de résidence, et aux fiches source A et B. Une candidate C contradictoire reste distincte et en revue.</desc>
+        <defs><marker id="arrow2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#657889"/></marker></defs>
+        <path class="edge" marker-end="url(#arrow2)" d="M350 137 L168 72"/><text class="small-label" x="240" y="91">membre de</text>
+        <path class="edge" marker-end="url(#arrow2)" d="M350 137 L527 72"/><text class="small-label" x="444" y="91">membre de</text>
+        <path class="edge" marker-end="url(#arrow2)" d="M350 147 L161 219"/><text class="small-label" x="230" y="194">WORKS_AT · épisode 1</text>
+        <path class="edge" marker-end="url(#arrow2)" d="M350 153 L522 219"/><text class="small-label" x="414" y="194">LIVES_AT</text>
+        <path class="edge dashed" d="M350 156 L350 256"/><text class="small-label" x="360" y="226">candidate non résolue</text>
+        <rect class="node" x="85" y="35" width="155" height="58" rx="4"/><text class="label" x="162" y="60" text-anchor="middle">RH A · Nora Martin</text><text class="small-label" x="162" y="80" text-anchor="middle">date concordante</text>
+        <rect class="node" x="450" y="35" width="155" height="58" rx="4"/><text class="label" x="527" y="60" text-anchor="middle">CRM B · Nora Martin</text><text class="small-label" x="527" y="80" text-anchor="middle">téléphone en conflit</text>
+        <rect class="gold" x="275" y="115" width="150" height="65" rx="4"/><text class="label" x="350" y="142" text-anchor="middle">Golden personne</text><text class="small-label" x="350" y="162" text-anchor="middle">valeurs sourcées</text>
+        <rect class="node" x="75" y="215" width="170" height="58" rx="4"/><text class="label" x="160" y="240" text-anchor="middle">Campus Nord</text><text class="small-label" x="160" y="260" text-anchor="middle">emploi, puis reprise</text>
+        <rect class="node" x="445" y="215" width="155" height="58" rx="4"/><text class="label" x="522" y="240" text-anchor="middle">Résidence</text><text class="small-label" x="522" y="260" text-anchor="middle">support à vérifier</text>
+        <rect x="283" y="255" width="134" height="36" rx="4" fill="#faf6eb" stroke="#a47d30" stroke-width="1.5"/><text class="small-label" x="350" y="278" text-anchor="middle">Annuaire C · revue</text>
+      </svg>
+      <figcaption>Voisinage d’une seule entité, volontairement réduit : une vue de ce type sert à examiner des liens et leur provenance, jamais à afficher un graphe de dix millions de nœuds.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="gestes">
+  <div class="section-id">3 · Qui fait quoi</div>
+  <h2>Gestes attendus, sans confondre cible et interface livrée</h2>
+  <div class="table-wrap" role="region" aria-label="Rôles, gestes et limites actuelles" tabindex="0">
+    <table><thead><tr><th>Rôle</th><th>Geste sur le cas</th><th>Limite actuelle</th></tr></thead>
+      <tbody>
+        <tr><td>Steward de source</td><td>Consulte l’anomalie liée à sa source, vérifie la fiche amont et demande une correction au responsable de cette source. La correction est ensuite réingérée comme nouvelle révision.</td><td>Consultation ETL locale en lecture seule ; aucune écriture vers la source ni file opérationnelle de correction.</td></tr>
+        <tr><td>Steward du référentiel</td><td>Examine la contradiction de date de C et le conflit de téléphone ; compare preuves et provenance, documente la décision autorisée. Tant que l’identité n’est pas établie, garde C séparée.</td><td>Arbitrage et console commune aux voies non livrés. Les captures existantes de maquettes ne sont pas une application connectée.</td></tr>
+        <tr><td>Ingénieur MDM</td><td>Vérifie le manifeste et la version des règles, lit le résultat DQ, les quarantaines, le run et l’état de fraîcheur ; corrige le contrat ou les règles, puis relance un cycle contrôlé et vérifie la publication.</td><td>Fonctions de qualité, historique et API partielles. Aucun droit d’accès/autorisation de production dans la consultation documentée.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Les décisions de steward devraient être auditées (acteur, motif, date, version) et ne pas éditer silencieusement les systèmes source. Ces rôles et délégations restent à valider par le métier et la sécurité.</p>
+</section>
+
+<section id="voies">
+  <div class="section-id">4 · Comparaison des voies</div>
+  <h2>Quatre options, quatre statuts de preuve</h2>
+  <p>Les prototypes A, B et C sont des implémentations séparées qui partagent le format de snapshots, pas les décisions de matching. Le tableau décrit les frontières réelles des essais ; il ne classe pas la performance.</p>
+  <div class="table-wrap" role="region" aria-label="Comparaison des approches et état de preuve" tabindex="0">
+    <table><thead><tr><th>Approche</th><th>Ce qui est démontré dans le laboratoire</th><th>Cible envisageable</th><th>Non mesuré ou non démontré</th></tr></thead>
+      <tbody>
+        <tr><td>ETL relationnel<br>PostgreSQL / ODBC</td><td><span class="status demo">DÉMONTRÉ · TRANCHE</span><br>Chargement par lots via pilote ODBC ; matching, survie, relations et publication SQL/PostgreSQL exécutés. 10 tests isolés ; l’oracle partiel accepte sept projections.</td><td>Compléter les règles et le contrat DQ ; reprise, audit et publication alignés avec les besoins.</td><td>Équivalence complète, comparaison à charge égale, capacité, coûts/ressources, sécurité et performance de production.</td></tr>
+        <tr><td>ELT<br>PostgreSQL / DuckDB / dbt</td><td><span class="status demo">DÉMONTRÉ · TRANCHE</span><br>Raw PostgreSQL, extraction en mémoire vers DuckDB, exécution de modèles/tests dbt et publication PostgreSQL ; 7 tests isolés ; sept projections partielles acceptées.</td><td>Réduire/justifier l’extraction en mémoire et aligner sémantique, DQ et cycles avec le contrat commun.</td><td>Équivalence générale avec ETL, tenue en charge, coût complet et comparaison contrôlée des ressources.</td></tr>
+        <tr><td>Graphe<br>PostgreSQL / Apache AGE / openCypher</td><td><span class="status demo">DÉMONTRÉ · INCOMPLET</span><br>Requêtes openCypher et traitements de la tranche exécutés ; 62 tests isolés. L’oracle échoue en C0 sur une contradiction de dates ; une anomalie DQ bloque le cycle commun C1.</td><td>Résoudre les écarts de règles, la granularité DQ, la correction/reprise et valider le cycle multijeu.</td><td>Conformité à l’oracle commun, équivalence aux autres voies, coûts et intérêt des parcours sous charge.</td></tr>
+        <tr><td>Hybride<br>Relationnel + graphe</td><td><span class="status">NON IMPLÉMENTÉ</span><br>Aucun trajet hybride complet dans le laboratoire.</td><td>Éventuellement, relationnel pour ingestion/qualité/survie et graphe pour exploration de relations, avec une autorité de publication clairement définie.</td><td>Gain métier, synchronisation, reprise, cohérence transactionnelle, exploitation et coût additionnel.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="caution"><strong>Pas de benchmark comparatif :</strong> le banc ne mesure actuellement ni CPU, ni mémoire, ni réseau, ni disque, ni phases de traitement. Aucune valeur de performance MDM ETL/ELT/graphe/hybride n’est publiée. Les taux/tests sur petites fixtures ne sont pas des mesures de performance, ni des preuves d’équivalence complète.</div>
+  <p><strong>Orchestration Python/dbt :</strong> le prototype ELT exécute réellement dbt, mais séquentiellement : Python attend la fin de chaque commande. La file persistante, les workers, l’admission concurrente, les budgets et la reprise prévus dans la <a href="SPECIFICATIONS.md">spécification du moteur</a> ne sont pas livrés. Le prototype ne doit donc pas être présenté comme conforme à cette spécification.</p>
+  <p>Les différences algorithmiques connues empêchent notamment d’inférer l’équivalence d’ETL et ELT à partir de la fixture : blocking par préfixe et normalisation Unicode côté ETL, égalité du champ entier et autre normalisation côté ELT. Une sonde de candidats a observé un cas où ETL propose une revue et ELT ne produit pas le candidat ; ce n’est ni une mesure de temps, ni une exécution de bout en bout.</p>
+</section>
+
+<section id="preuves">
+  <div class="section-id">5 · Ce que les preuves permettent de dire</div>
+  <h2>Distinguer prototype, objectif et inconnues</h2>
+  <ul>
+    <li><strong>Démontré :</strong> un jeu synthétique local et des tranches distinctes exécutables ; PostgreSQL, ODBC et AGE/openCypher ont été essayés dans leurs tests de laboratoire ; une chaîne de faisabilité PostgreSQL → DuckDB/dbt-duckdb → PostgreSQL a été exécutée.</li>
+    <li><strong>Partiel :</strong> contrats Pydantic et primitives de profiling, normalisation et validation ; observations DQ ; historique par voie de couverture inégale ; consultation API/IHM ETL en mode démonstration. Cela ne vaut pas une politique DQ et de publication complète.</li>
+    <li><strong>Cible :</strong> mêmes règles métier/version, oracle étendu, gestion des conflits, isolation DQ selon contrats, reprise contrôlée, stewardship commun et comparaison reproductible.</li>
+    <li><strong>Non démontré / non mesuré :</strong> trois moteurs complets conformes, benchmark de rapprochement, exécution à dix millions, latence, capacité de production, sécurité de la console, droits et intégration des voies.</li>
+  </ul>
+  <p>Le résultat graphe actuellement documenté est important pour la décision : une contradiction de dates demeure une limite de la règle de rapprochement et une anomalie DQ arrête tout le cycle au lieu d’isoler un objet. Il n’est donc pas présenté comme équivalent au contrat cible, même si sa suite de tests isolés réussit.</p>
+</section>
+
+<section id="ihm">
+  <div class="section-id">6 · Consultation observée et illustrations</div>
+  <h2>Deux catégories de visuels, deux statuts distincts</h2>
+  <div class="note"><strong>Captures réelles ci-dessous :</strong> API/IHM de consultation de la voie ETL sur la fixture synthétique C0–C5, en lecture seule. L’écran d’anomalies présente l’historique des quarantaines, et non une file ouverte de travail. Cette consultation ne fournit ni arbitrage, ni correction source, ni droits/autorisation de production. Elle n’est pas la console commune de stewardship.</div>
+  <div class="screens">
+    <figure><img src="assets/mdm-etl-reel-liste.png" alt="Capture réelle de la consultation ETL en lecture seule, liste sur fixture synthétique C0 à C5"><figcaption><strong>Capture réelle · consultation ETL.</strong> Liste issue de la fixture synthétique C0–C5 ; lecture seule, sans authentification ni autorisation de production.</figcaption></figure>
+    <figure><img src="assets/mdm-etl-reel-anomalies.png" alt="Capture réelle de la consultation ETL montrant l’historique des quarantaines de la fixture C0 à C5"><figcaption><strong>Capture réelle · historique des quarantaines.</strong> Ce n’est ni une file ouverte de dossiers à traiter, ni une fonction d’arbitrage ou de correction.</figcaption></figure>
+  </div>
+  <p>La consultation existante est décrite dans le <a href="../src/web/README.md">README de l’API et des pages en lecture</a>. Elle ne démontre pas les fonctions cibles de stewardship ni une connexion aux voies ELT et graphe.</p>
+  <h3>Maquettes illustratives, non connectées</h3>
+  <p>Les trois images qui suivent sont conservées comme <strong>captures fictives de maquettes</strong>. Elles illustrent des écrans envisagés ; elles ne sont ni des captures réelles du produit, ni une preuve de recherche, de file de travail, d’arbitrage, de droits ou de performance.</p>
+  <div class="screens three">
+    <figure><img src="assets/mdm-console-steward.png" alt="Maquette fictive, non connectée, d’une file d’anomalies pour steward source"><figcaption><strong>Maquette fictive</strong> · vue envisagée du steward de source.</figcaption></figure>
+    <figure><img src="assets/mdm-console-master.png" alt="Maquette fictive, non connectée, d’un dossier d’arbitrage du référentiel"><figcaption><strong>Maquette fictive</strong> · vue envisagée d’un dossier d’arbitrage.</figcaption></figure>
+    <figure><img src="assets/mdm-console-engineer.png" alt="Maquette fictive, non connectée, de supervision des cycles par l’ingénieur MDM"><figcaption><strong>Maquette fictive</strong> · vue envisagée de supervision des cycles.</figcaption></figure>
+  </div>
+  <p class="small">La <a href="MDM_CONSOLE_DEMO.html">maquette interactive</a> est elle aussi fictive et non connectée ; elle ne doit pas être confondue avec la consultation réelle ETL ci-dessus.</p>
+</section>
+
+<section id="echelle">
+  <div class="section-id">7 · Échelle et méthode de comparaison</div>
+  <h2>Rechercher un voisinage, pas afficher tout le référentiel</h2>
+  <p>À l’échelle envisagée, l’utilisateur recherche une entité ou traite une liste paginée. Il explore ensuite un voisinage borné, avec supports, dates et indication de troncature. Le dessin précédent ne représente que les liens utiles à un dossier. Il ne faut jamais visualiser dix millions de nœuds simultanément.</p>
+  <p>Avant toute comparaison de temps, il faut d’abord établir un oracle indépendant suffisamment complet et des règles équivalentes. Puis figer mêmes entrées, cycles, transformations, conditions d’exécution et ressources ; protéger les attendus des moteurs ; vérifier sorties, erreurs, rejouabilité et historique ; enfin relever plusieurs répétitions, ressources et temps par phase. Toute divergence invalide un classement de vitesse.</p>
+  <p>Le générateur de données volumineuses disponible est partiel et aucun adaptateur ne valide une exécution MDM à dix millions. Les estimations de charge et les chiffres d’autres produits ou opérations analytiques ne remplacent pas cette mesure.</p>
+</section>
+
+<section id="sources">
+  <div class="section-id">8 · Documents de référence du laboratoire</div>
+  <h2>État détaillé et limites techniques</h2>
+  <ul>
+    <li><a href="MDM_SWARM_STATUS.md">État du swarm MDM</a> — résultats, validations et limites datés du 12 novembre 2026.</li>
+    <li><a href="MDM_RECONCILIATION_SPEC.md">Spécification de réconciliation</a> — contrat proposé, modèle, règles, DQ, stewardship et sécurité.</li>
+    <li><a href="../deploy/etl/README.md">Voie ETL / ODBC</a> · <a href="../engine/elt/README.md">Voie ELT / DuckDB / dbt</a> · <a href="../engine/graph/README.md">Voie graphe / AGE</a>.</li>
+    <li><a href="../engine/benchmark/README.md">Banc et limites de comparaison</a> · <a href="../src/web/README.md">Consultation locale ETL</a>.</li>
+    <li><a href="MDM_DECISIONS.md">Décisions et recherches</a> · <a href="MDM_SPRINTS.md">Backlog de sprints</a>.</li>
+  </ul>
+  <p class="small">Les documents techniques font foi pour l’état des implémentations. Si une description illustrative de cette note semble plus ambitieuse, la limite explicitement indiquée dans ces documents prévaut.</p>
+</section>
+</main>
+</div>
+</body>
+</html>

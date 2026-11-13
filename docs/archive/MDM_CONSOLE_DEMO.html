@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Console MDM — maquette de stewardship</title>
+  <style>
+    :root{color-scheme:light;--ink:#17172b;--muted:#666b80;--line:#e6e7f0;--paper:#fff;--bg:#f4f5fa;--purple:#6644d9;--purple-light:#f1edff;--blue:#346ad9;--teal:#087c73;--amber:#9a5d00;--red:#b43550;--nav:#171326}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button{font:inherit}
+    button:focus-visible,a:focus-visible{outline:3px solid #4779ff;outline-offset:3px}
+    [hidden]{display:none!important}
+    .demo-banner{background:#ffdf86;color:#322206;text-align:center;padding:9px 16px;font-weight:800;letter-spacing:.045em;font-size:12px}
+    .shell{display:grid;grid-template-columns:224px minmax(0,1fr);min-height:calc(100vh - 35px)}
+    .sidebar{background:var(--nav);color:#fff;padding:27px 19px;display:flex;flex-direction:column;gap:32px}
+    .brand{display:flex;gap:11px;align-items:center;font-weight:760;line-height:1.15;letter-spacing:-.03em}
+    .brand-mark{width:37px;height:37px;border:1px solid #a68eff;border-radius:11px;background:linear-gradient(145deg,#8c6bff,#4633a1);display:grid;place-items:center;font-size:19px}
+    .brand small{display:block;color:#a6a0bc;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
+    .nav-label{color:#918ca4;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin:0 10px 11px}
+    .nav-item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:8px;color:#c5c1d3;font-size:13px}
+    .nav-item.active{color:#fff;background:#352a58;font-weight:700}
+    .nav-icon{width:18px;text-align:center;color:#ab9aed;font-size:15px}
+    .side-note{margin-top:auto;border:1px solid #41395a;border-radius:10px;padding:14px;color:#c5bfd8;font-size:11px}
+    .side-note strong{display:block;color:#eee9ff;font-size:12px;margin-bottom:5px}
+    .side-note p{margin:0;line-height:1.5}
+    main{min-width:0;padding:24px 32px 32px;max-width:1600px;width:100%;margin:auto}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin-bottom:22px}
+    .crumb strong{color:#333448}.top-right{display:flex;align-items:center;gap:10px}
+    .environment{background:#e8e7f7;color:#50428f;border-radius:99px;padding:5px 9px;font-weight:700;font-size:10px;letter-spacing:.04em}
+    .avatar{width:28px;height:28px;border-radius:50%;background:#dfd7fb;color:#5235b5;display:grid;place-items:center;font-weight:800}
+    .heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:20px}
+    .eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--purple);font-weight:850;margin:0 0 5px}
+    h1{font-size:27px;line-height:1.15;letter-spacing:-.035em;margin:0 0 6px}
+    .subtitle{color:var(--muted);margin:0;font-size:13px}
+    .context{font-size:11px;color:var(--muted);text-align:right}.context strong{display:block;color:var(--ink);font-size:12px}
+    .roles{display:flex;gap:5px;border-bottom:1px solid #dcdde8;margin-bottom:20px;overflow-x:auto}
+    .role-tab{border:0;border-bottom:3px solid transparent;background:transparent;padding:10px 15px 11px;color:#61667a;white-space:nowrap;cursor:pointer;font-size:12px;font-weight:700}
+    .role-tab[aria-selected="true"]{color:#5633c4;border-color:#704ee2}
+    .panel-intro{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:14px}
+    .panel-intro h2{margin:0;font-size:17px;letter-spacing:-.02em}
+    .panel-intro p{margin:4px 0 0;color:var(--muted);font-size:12px}
+    .fake-tag{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#6b5b95;background:#ede9f9;padding:5px 9px;border-radius:5px;white-space:nowrap}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+    .metric,.card{background:var(--paper);border:1px solid var(--line);border-radius:11px;box-shadow:0 3px 14px #29214b08}
+    .metric{padding:14px 16px;min-height:102px}
+    .metric-label{color:var(--muted);font-size:11px;font-weight:650;display:flex;justify-content:space-between;gap:4px}
+    .metric-value{font-size:25px;line-height:1.1;letter-spacing:-.05em;font-weight:760;margin:9px 0 4px}
+    .metric-foot{font-size:10px;color:var(--muted)}
+    .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:5px;vertical-align:1px}
+    .purple{color:var(--purple)}.red{color:var(--red)}.teal{color:var(--teal)}.amber{color:var(--amber)}
+    .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:14px;align-items:start}
+    .stack{display:grid;gap:14px}
+    .card{padding:17px 18px;min-width:0}
+    .card-head{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:14px}
+    .card-head h3{margin:0;font-size:14px;letter-spacing:-.01em}
+    .card-head p{margin:3px 0 0;color:var(--muted);font-size:11px}
+    .pill{display:inline-block;border-radius:5px;padding:4px 7px;font-size:10px;font-weight:750;line-height:1.2}
+    .pill.purple{background:#f0ebff}.pill.red{background:#fff0f2}.pill.amber{background:#fff4db}.pill.teal{background:#e5f6f1}.pill.gray{background:#f0f1f5;color:#62677a}
+    .detail-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+    .detail-tab{border:1px solid #e3e3ed;border-radius:6px;color:#5e6377;background:#fff;padding:6px 9px;font-size:11px;font-weight:700;cursor:pointer}
+    .detail-tab[aria-selected="true"]{background:#f2efff;border-color:#cabdf8;color:#5435bd}
+    .issue{border:1px solid #ebebf3;border-radius:8px;overflow:hidden}
+    .issue-top{background:#faf9fd;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .issue-top strong{font-size:12px}.issue-body{padding:12px}
+    .issue-body p{margin:0 0 10px;color:#555b70;font-size:12px}
+    .issue-body p:last-child{margin-bottom:0}
+    .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0}
+    .facts div{min-width:0}.facts dt{font-size:10px;color:#7a7e90;margin-bottom:2px}.facts dd{font-size:12px;font-weight:700;margin:0;overflow-wrap:anywhere}
+    .callout{border-left:3px solid #7d62df;background:#f6f3ff;border-radius:0 7px 7px 0;padding:10px 12px;color:#4e466d;font-size:11px;line-height:1.5}
+    .callout strong{color:#392d68}
+    .divider{height:1px;background:var(--line);margin:14px 0}
+    .flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    .flow-node{flex:1;min-width:100px;border:1px solid #e8e7f0;border-radius:8px;padding:9px;background:#fbfbfe}
+    .flow-node small{display:block;color:#777b8d;font-size:10px}.flow-node strong{font-size:11px}
+    .flow-arrow{color:#a59bc7;font-size:15px}
+    .relation{display:flex;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f5;font-size:11px}
+    .relation:last-child{border:0;padding-bottom:0}.relation .rel-name{flex:1}.relation strong{display:block;font-size:12px}.relation small{color:var(--muted)}
+    .node-icon{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:9px;background:#eeeaff;color:#6949d2;font-weight:800}
+    .node-icon.place{background:#e8f0ff;color:#3269c9}
+    .legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:10px;margin-top:10px}
+    .swatch{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+    .chart{width:100%;height:auto;display:block}
+    .chart text{font:10px system-ui,sans-serif;fill:#696d80}
+    .chart .value{font-weight:700;fill:#33354a}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:11px;text-align:left}
+    th{color:#85899a;font-size:9px;text-transform:uppercase;letter-spacing:.07em;padding:0 8px 8px 0}
+    td{padding:9px 8px 9px 0;border-top:1px solid #f0f0f5;vertical-align:top}
+    .footnote{color:#737789;font-size:10px;line-height:1.5;margin:10px 0 0}
+    .status-list{display:grid;gap:9px;font-size:11px}
+    .status-row{display:flex;justify-content:space-between;gap:10px}.status-row span:first-child{color:#686d80}
+    .footer{display:flex;justify-content:space-between;gap:12px;color:#8a8d9d;font-size:10px;margin-top:18px}
+    @media(min-width:1001px) and (max-height:950px){
+      main{padding-top:12px;padding-bottom:8px}.topline{margin-bottom:10px}.heading{margin-bottom:10px}h1{font-size:24px}.roles{margin-bottom:10px}.role-tab{padding-top:7px;padding-bottom:7px}.panel-intro{margin-bottom:8px}.metrics{margin-bottom:10px}.metric{padding:10px 14px;min-height:84px}.metric-value{font-size:22px;margin:6px 0 3px}.card{padding:12px 15px}.card-head{margin-bottom:8px}.detail-tabs{margin-bottom:8px}.issue-top,.issue-body{padding:8px 10px}.issue-body p{margin-bottom:7px}.facts{gap:6px}.divider{margin:8px 0}.callout{padding:7px 10px}.flow-node{padding:7px}.stack{gap:10px}.relation{padding:6px 0}.footer{margin-top:10px}.chart{max-height:120px}
+    }
+    @media(max-width:1000px){.shell{grid-template-columns:185px minmax(0,1fr)}main{padding:22px}.grid{grid-template-columns:1fr}.sidebar{padding:23px 14px}}
+    @media(max-width:680px){.shell{display:block}.sidebar{padding:14px 18px;display:flex;flex-direction:row;align-items:center;justify-content:space-between}.sidebar nav,.side-note{display:none}.brand-mark{width:32px;height:32px}.topline{margin-bottom:16px}.heading{align-items:start}.context{display:none}main{padding:18px 15px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-height:92px}.role-tab{padding-left:10px;padding-right:10px}.panel-intro{align-items:center}.fake-tag{white-space:normal;text-align:right}.footer{display:block}}
+    @media print{body{background:#fff;font-size:11px}.demo-banner{print-color-adjust:exact;-webkit-print-color-adjust:exact}.shell{display:block}.sidebar,.roles,.detail-tabs,.topline,.footer{display:none}main{padding:10px;max-width:none}.role-panel[hidden],.detail-panel[hidden]{display:block!important}.role-panel{break-before:page}.role-panel:first-of-type{break-before:auto}.detail-panel{margin-bottom:10px}.card,.metric{box-shadow:none;break-inside:avoid}.grid{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:repeat(4,1fr)}.heading{margin-bottom:12px}}
+  </style>
+</head>
+<body>
+  <div class="demo-banner">MAQUETTE — données fictives — aucune action réelle</div>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Contexte de la maquette">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span>data adventure<small>MDM / laboratoire</small></span></div>
+      <nav aria-label="Repères visuels">
+        <p class="nav-label">Espace de travail</p>
+        <div class="nav-item active"><span class="nav-icon" aria-hidden="true">▦</span> Vue d’ensemble</div>
+        <div class="nav-item"><span class="nav-icon" aria-hidden="true">◈</span> Qualité &amp; sources</div>
+        <div class="nav-item"><span class="nav-icon" aria-hidden="true">◇</span> Identités &amp; liens</div>
+        <div class="nav-item"><span class="nav-icon" aria-hidden="true">≋</span> Observabilité</div>
+      </nav>
+      <div class="side-note"><strong>Une illustration, pas un produit</strong><p>Aucun moteur de réconciliation, aucune voie ELT ni IHM métier livrés. Aucune connexion active.</p></div>
+    </aside>
+    <main>
+      <div class="topline"><div class="crumb">LABORATOIRE <span aria-hidden="true">/</span> <strong>Console MDM</strong></div><div class="top-right"><span class="environment">DÉMO LOCALE</span><span class="avatar" aria-hidden="true">D</span></div></div>
+      <header class="heading">
+        <div><p class="eyebrow">Data stewardship · aperçu conceptuel</p><h1>Une vue commune de la donnée</h1><p class="subtitle">Comprendre les anomalies, les décisions et les liens, à travers trois regards.</p></div>
+        <div class="context"><strong>Illustration pour comité</strong>Scénarios et valeurs inventés</div>
+      </header>
+
+      <div class="roles" role="tablist" aria-label="Choisir une perspective">
+        <button class="role-tab" role="tab" id="tab-source" aria-controls="panel-source" aria-selected="true" tabindex="0">01 &nbsp; Data steward source</button>
+        <button class="role-tab" role="tab" id="tab-master" aria-controls="panel-master" aria-selected="false" tabindex="-1">02 &nbsp; Master steward</button>
+        <button class="role-tab" role="tab" id="tab-engineer" aria-controls="panel-engineer" aria-selected="false" tabindex="-1">03 &nbsp; Ingénieur MDM</button>
+      </div>
+
+      <section class="role-panel" id="panel-source" role="tabpanel" aria-labelledby="tab-source" tabindex="0">
+        <div class="panel-intro"><div><h2>Qualité à la source</h2><p>Un périmètre source, des anomalies explicables et un retour vers le bon système.</p></div><span class="fake-tag">Exemple fictif · Source A</span></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Enregistrements observés <span class="purple">◫</span></div><div class="metric-value">1 240</div><div class="metric-foot">Exemple fictif · instantané A</div></div>
+          <div class="metric"><div class="metric-label">Anomalies ouvertes <span class="red">◉</span></div><div class="metric-value">18</div><div class="metric-foot"><span class="red">●</span> 4 bloquantes · exemple fictif</div></div>
+          <div class="metric"><div class="metric-label">Objets en attente <span class="amber">◷</span></div><div class="metric-value">6</div><div class="metric-foot">Exemple fictif · périmètre isolé</div></div>
+          <div class="metric"><div class="metric-label">Contrôles conformes <span class="teal">✓</span></div><div class="metric-value">96 %</div><div class="metric-foot">Exemple fictif · contrôles évalués</div></div>
+        </div>
+        <div class="grid">
+          <div class="stack">
+            <article class="card">
+              <div class="card-head"><div><h3>File des anomalies</h3><p>Sélectionner un exemple pour comprendre son traitement envisagé.</p></div><span class="pill gray">SOURCE A</span></div>
+              <div class="detail-tabs" role="tablist" aria-label="Exemples d'anomalies source">
+                <button class="detail-tab" role="tab" id="source-example-1" aria-controls="source-detail-1" aria-selected="true" tabindex="0">Adresse invalide</button>
+                <button class="detail-tab" role="tab" id="source-example-2" aria-controls="source-detail-2" aria-selected="false" tabindex="-1">Doublon source</button>
+              </div>
+              <div class="detail-panel" role="tabpanel" id="source-detail-1" aria-labelledby="source-example-1" tabindex="0">
+                <div class="issue"><div class="issue-top"><strong>Lieu · A-L042 <span class="pill red">Bloquante</span></strong><span class="pill gray">Révision fictive 3</span></div><div class="issue-body"><p>Le code postal « 75X01 » ne respecte pas le format attendu. La révision invalide reste visible ; elle n’efface pas l’historique.</p><dl class="facts"><div><dt>Contrôle illustratif</dt><dd>Format du code postal</dd></div><div><dt>Effet envisagé</dt><dd>Lieu et relation en attente</dd></div><div><dt>Origine</dt><dd>Référentiel A · lieux</dd></div><div><dt>Correction</dt><dd>Dans le système source A</dd></div></dl></div></div>
+              </div>
+              <div class="detail-panel" role="tabpanel" id="source-detail-2" aria-labelledby="source-example-2" tabindex="0" hidden>
+                <div class="issue"><div class="issue-top"><strong>Personne · A-P118 <span class="pill amber">À examiner</span></strong><span class="pill gray">Exemple fictif</span></div><div class="issue-body"><p>Deux fiches de la même source pourraient désigner une personne. La nouvelle affectation est en attente ; aucun retrait automatique n’est supposé.</p><dl class="facts"><div><dt>Signal</dt><dd>Nom et contact proches</dd></div><div><dt>Effet envisagé</dt><dd>Revue de l’identité</dd></div><div><dt>Origine</dt><dd>Référentiel A · personnes</dd></div><div><dt>Correction</dt><dd>Dans le système source A</dd></div></dl></div></div>
+              </div>
+              <div class="divider"></div>
+              <div class="callout"><strong>La correction ne se fait pas ici.</strong> Dans le scénario cible, le steward corrige uniquement dans le référentiel source ; une nouvelle révision serait ingérée au cycle suivant. Les effets DQ restent à valider.</div>
+            </article>
+            <article class="card"><div class="card-head"><div><h3>Du signal à la résolution</h3><p>Parcours conceptuel, sans traitement exécuté</p></div></div><div class="flow"><div class="flow-node"><small>01 · Observer</small><strong>Anomalie DQ</strong></div><span class="flow-arrow" aria-hidden="true">→</span><div class="flow-node"><small>02 · Corriger</small><strong>Système source</strong></div><span class="flow-arrow" aria-hidden="true">→</span><div class="flow-node"><small>03 · Revoir</small><strong>Prochain cycle</strong></div></div></article>
+          </div>
+          <div class="stack">
+            <article class="card"><div class="card-head"><div><h3>Relations sous surveillance</h3><p>Personne et lieu · exemple fictif</p></div><span class="pill red">Incohérence</span></div>
+              <div class="relation"><span class="node-icon" aria-hidden="true">P</span><div class="rel-name"><strong>Alex Martin</strong><small>Personne · A-P118</small></div><span class="pill teal">Valide</span></div>
+              <div class="relation"><span class="node-icon place" aria-hidden="true">L</span><div class="rel-name"><strong>Atelier Nord</strong><small>Lieu · A-L042</small></div><span class="pill red">Invalide</span></div>
+              <div class="divider"></div><p class="footnote"><strong>WORKS_AT</strong> · L’affirmation source est conservée. Le lieu invalide et la relation concernée sont visibles ; aucun lien n’est inventé ni historique effacé.</p>
+            </article>
+            <article class="card"><div class="card-head"><div><h3>Cadre de lecture</h3><p>Ce que montre cette perspective</p></div><span class="pill purple">Source A</span></div><div class="status-list"><div class="status-row"><span>Périmètre</span><strong>Erreurs de sa source</strong></div><div class="status-row"><span>Données d’origine</span><strong>Conservées</strong></div><div class="status-row"><span>Accès &amp; permissions</span><strong>À construire</strong></div></div><p class="footnote">La sélection de rôle illustre une vue ; elle ne constitue ni une authentification ni un contrôle d’accès.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="role-panel" id="panel-master" role="tabpanel" aria-labelledby="tab-master" tabindex="0" hidden>
+        <div class="panel-intro"><div><h2>Identités &amp; arbitrages</h2><p>Lire les raisons d’un conflit avant toute décision humaine, dans un scénario hypothétique.</p></div><span class="fake-tag">Exemples fictifs · personnes &amp; lieux</span></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Dossiers en revue <span class="purple">◇</span></div><div class="metric-value">12</div><div class="metric-foot">Exemple fictif · identités et attributs</div></div>
+          <div class="metric"><div class="metric-label">Identités ambiguës <span class="amber">◷</span></div><div class="metric-value">7</div><div class="metric-foot">Exemple fictif · décision humaine</div></div>
+          <div class="metric"><div class="metric-label">Conflits d’attributs <span class="red">◉</span></div><div class="metric-value">5</div><div class="metric-foot">Exemple fictif · alternatives visibles</div></div>
+          <div class="metric"><div class="metric-label">Relations à examiner <span class="blue">↗</span></div><div class="metric-value">3</div><div class="metric-foot">Exemple fictif · extrémités / supports</div></div>
+        </div>
+        <div class="grid">
+          <div class="stack"><article class="card">
+            <div class="card-head"><div><h3>Dossiers illustratifs</h3><p>Les pistes d’arbitrage ne déclenchent aucune action.</p></div><span class="pill amber">Revue humaine</span></div>
+            <div class="detail-tabs" role="tablist" aria-label="Exemples de conflits">
+              <button class="detail-tab" role="tab" id="master-example-1" aria-controls="master-detail-1" aria-selected="true" tabindex="0">Identité ambiguë</button>
+              <button class="detail-tab" role="tab" id="master-example-2" aria-controls="master-detail-2" aria-selected="false" tabindex="-1">Attribut en conflit</button>
+            </div>
+            <div class="detail-panel" role="tabpanel" id="master-detail-1" aria-labelledby="master-example-1" tabindex="0"><div class="issue"><div class="issue-top"><strong>Personne · dossier P-021</strong><span class="pill amber">À arbitrer</span></div><div class="issue-body"><p><strong>Alex Martin</strong> (A) et <strong>Alexis Martin</strong> (B) partagent un contact proche, mais leur date de naissance diffère. Exemple de score : <strong>0,92</strong> ; une contradiction impose une revue, même avec un score élevé.</p><dl class="facts"><div><dt>Raison de la revue</dt><dd>Identité contradictoire</dd></div><div><dt>Pistes illustratives</dt><dd>Confirmer ou refuser le lien</dd></div><div><dt>Provenance</dt><dd>Sources A et B fictives</dd></div><div><dt>Effet actuel</dt><dd>Aucune fusion effectuée</dd></div></dl></div></div></div>
+            <div class="detail-panel" role="tabpanel" id="master-detail-2" aria-labelledby="master-example-2" tabindex="0" hidden><div class="issue"><div class="issue-top"><strong>Lieu · dossier L-014</strong><span class="pill amber">À arbitrer</span></div><div class="issue-body"><p>Pour un même lieu fictif, A indique « Atelier Nord » et B « Studio Nord ». L’exemple suppose un conflit non résolu par les règles de survie.</p><dl class="facts"><div><dt>Raison de la revue</dt><dd>Libellés incompatibles</dd></div><div><dt>Pistes illustratives</dt><dd>Examiner valeur et provenance</dd></div><div><dt>Valeur publiée antérieure</dt><dd>Atelier Nord · conservée</dd></div><div><dt>Fraîcheur</dt><dd>Valeur antérieure, non fraîche</dd></div></dl></div></div></div>
+            <div class="divider"></div><div class="callout"><strong>Arbitrage envisagé, jamais simulé comme une écriture.</strong> Une future décision devrait être motivée, versionnée et auditée, puis appliquée au cycle prévu. Les droits et règles restent à construire.</div>
+          </article>
+          <article class="card"><div class="card-head"><div><h3>Seuils de démonstration</h3><p>Hypothèses provisoires, non calibrées pour la production</p></div></div><div class="flow"><div class="flow-node"><small>Score &lt; 0,80</small><strong>Pas de match proposé</strong></div><div class="flow-node"><small>0,80 à &lt; 0,95</small><strong>Revue</strong></div><div class="flow-node"><small>≥ 0,95</small><strong>Auto sous conditions</strong></div></div><p class="footnote">Un seul candidat éligible et aucune contradiction sont requis pour l’appariement automatique. Un score n’est pas une preuve d’identité.</p></article></div>
+          <div class="stack"><article class="card"><div class="card-head"><div><h3>Contexte relationnel</h3><p>Une affirmation source n’est pas un lien golden garanti</p></div><span class="pill red">Lieu invalide</span></div>
+            <div class="relation"><span class="node-icon" aria-hidden="true">P</span><div class="rel-name"><strong>Alex Martin</strong><small>Personne · source A</small></div><span class="pill gray">Source</span></div>
+            <div class="relation"><span class="node-icon place" aria-hidden="true">L</span><div class="rel-name"><strong>Atelier Nord</strong><small>Lieu · code postal invalide</small></div><span class="pill red">Invalide</span></div>
+            <div class="divider"></div><p class="footnote"><strong>WORKS_AT</strong> · Support source conservé ; relation en attente dans cet exemple. Une extrémité absente ou ambiguë exige une quarantaine, pas un lien fabriqué.</p>
+          </article><article class="card"><div class="card-head"><div><h3>Principes de gouvernance</h3></div></div><div class="status-list"><div class="status-row"><span>Décision</span><strong>Humaine &amp; motivée</strong></div><div class="status-row"><span>Lignage</span><strong>Source et règle visibles</strong></div><div class="status-row"><span>Historique</span><strong>Pas d’effacement silencieux</strong></div><div class="status-row"><span>Portée</span><strong>Personne ou lieu</strong></div></div></article></div>
+        </div>
+      </section>
+
+      <section class="role-panel" id="panel-engineer" role="tabpanel" aria-labelledby="tab-engineer" tabindex="0" hidden>
+        <div class="panel-intro"><div><h2>Observabilité du laboratoire</h2><p>Exemple de lecture d’un cycle futur, et état réel du projet clairement séparé.</p></div><span class="fake-tag">Toutes les métriques ci-dessous sont fictives</span></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Cycle illustré <span class="purple">◫</span></div><div class="metric-value">C06</div><div class="metric-foot">Exemple fictif · aucune exécution MDM</div></div>
+          <div class="metric"><div class="metric-label">Paires scorées <span class="blue">≋</span></div><div class="metric-value">200</div><div class="metric-foot">Exemple fictif · personnes, source A</div></div>
+          <div class="metric"><div class="metric-label">Sans score <span class="amber">◷</span></div><div class="metric-value">10</div><div class="metric-foot">Exemple fictif · 210 candidates au total</div></div>
+          <div class="metric"><div class="metric-label">Config de règles <span class="teal">◈</span></div><div class="metric-value">v1.2</div><div class="metric-foot">Version fictive · seuils illustratifs</div></div>
+        </div>
+        <div class="grid">
+          <div class="stack"><article class="card"><div class="card-head"><div><h3>Distribution des scores</h3><p>Exemple fictif · paires candidates scorées · source A / personne</p></div><span class="pill purple">C06 vs C05</span></div>
+            <svg class="chart" viewBox="0 0 600 145" role="img" aria-labelledby="chart-title chart-desc">
+              <title id="chart-title">Distribution illustrative des scores</title><desc id="chart-desc">Pour 200 paires scorées dans chaque cycle fictif : C05, 100, 70 et 30 paires ; C06, 80, 80 et 40 paires, respectivement sous 0,80, de 0,80 à moins de 0,95 et à partir de 0,95.</desc>
+              <line x1="120" y1="14" x2="120" y2="125" stroke="#dedfeb"/><line x1="120" y1="125" x2="560" y2="125" stroke="#dedfeb"/>
+              <text x="0" y="33">&lt; 0,80</text><text x="0" y="72">0,80 à &lt; 0,95</text><text x="0" y="111">≥ 0,95</text>
+              <rect x="120" y="18" width="220" height="9" rx="4" fill="#c6bcf0"/><rect x="120" y="29" width="176" height="9" rx="4" fill="#6848d5"/><text class="value" x="350" y="36">50 % → 40 %</text>
+              <rect x="120" y="57" width="154" height="9" rx="4" fill="#c6bcf0"/><rect x="120" y="68" width="176" height="9" rx="4" fill="#6848d5"/><text class="value" x="307" y="75">35 % → 40 %</text>
+              <rect x="120" y="96" width="66" height="9" rx="4" fill="#c6bcf0"/><rect x="120" y="107" width="88" height="9" rx="4" fill="#6848d5"/><text class="value" x="220" y="114">15 % → 20 %</text>
+            </svg>
+            <div class="legend"><span><span class="swatch" style="background:#c6bcf0"></span>C05 · référence fictive</span><span><span class="swatch" style="background:#6848d5"></span>C06 · cycle fictif</span></div>
+            <p class="footnote">C05 : 100 / 70 / 30 ; C06 : 80 / 80 / 40 paires sur 200 scorées par cycle. Écarts : −10 / +5 / +5 points. Même population, blocking et formule supposés ; sinon comparaison non pertinente. Les 10 paires sans score de C06 sont hors dénominateur. Une dérive n’est pas une mesure de justesse.</p>
+          </article>
+          <article class="card"><div class="card-head"><div><h3>Journal de cycle illustratif</h3><p>Étapes fictives, aucune exécution connectée</p></div><span class="pill gray">C06 · fictif</span></div><div class="table-wrap"><table><thead><tr><th>Étape</th><th>État illustré</th><th>Lecture</th></tr></thead><tbody><tr><td>Contrôles source</td><td><span class="pill amber">Anomalie</span></td><td>Lieu A-L042 invalide</td></tr><tr><td>Rapprochement</td><td><span class="pill amber">Revue</span></td><td>Contradiction d’identité</td></tr><tr><td>Publication</td><td><span class="pill gray">Non exécutée</span></td><td>Aucune livraison réelle</td></tr></tbody></table></div></article></div>
+          <div class="stack"><article class="card"><div class="card-head"><div><h3>Architecture cible</h3><p>Trois voies envisagées, contrat commun</p></div><span class="pill purple">À construire</span></div>
+            <div class="relation"><span class="node-icon" aria-hidden="true">A</span><div class="rel-name"><strong>ETL relationnel</strong><small>PostgreSQL · ODBC · lots</small></div><span class="pill gray">Non livré</span></div>
+            <div class="relation"><span class="node-icon" aria-hidden="true">B</span><div class="rel-name"><strong>ELT</strong><small>PostgreSQL · DuckDB · dbt</small></div><span class="pill gray">Non livré</span></div>
+            <div class="relation"><span class="node-icon" aria-hidden="true">C</span><div class="rel-name"><strong>Graphe</strong><small>PostgreSQL · AGE / openCypher</small></div><span class="pill gray">Non livré</span></div>
+            <p class="footnote">Pistes d’architecture, pas des moteurs disponibles ni une comparaison de performances. Les décisions et résultats de chaque voie restent à implémenter et vérifier.</p>
+          </article><article class="card"><div class="card-head"><div><h3>État réel du projet</h3><p>Selon le point de reprise du laboratoire</p></div><span class="pill gray">Non connecté</span></div><div class="status-list"><div class="status-row"><span>API</span><strong>Squelette health uniquement</strong></div><div class="status-row"><span>DQ &amp; drift</span><strong>Composants partiels</strong></div><div class="status-row"><span>Trois moteurs / console</span><strong>Non livrés</strong></div><div class="status-row"><span>Résultats de matching</span><strong>Aucun résultat annoncé</strong></div></div><p class="footnote">Cette page est autonome : aucune API, aucun serveur, aucune donnée ou mesure réelle.</p></article></div>
+        </div>
+      </section>
+      <div class="footer"><span>MDM LAB / CONSOLE CONCEPTUELLE</span><span>Données, noms, scores et cycles fictifs · aucune action réelle</span></div>
+    </main>
+  </div>
+  <script>
+    document.querySelectorAll('[role="tablist"]').forEach(function (list) {
+      var tabs = Array.from(list.querySelectorAll('[role="tab"]'));
+      function selectTab(tab, focus) {
+        tabs.forEach(function (item) {
+          var selected = item === tab;
+          item.setAttribute('aria-selected', String(selected));
+          item.tabIndex = selected ? 0 : -1;
+          document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
+        });
+        if (focus) tab.focus();
+      }
+      tabs.forEach(function (tab, index) {
+        tab.addEventListener('click', function () { selectTab(tab, false); });
+        tab.addEventListener('keydown', function (event) {
+          var next;
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+          else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + tabs.length) % tabs.length;
+          else if (event.key === 'Home') next = 0;
+          else if (event.key === 'End') next = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          selectTab(tabs[next], true);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

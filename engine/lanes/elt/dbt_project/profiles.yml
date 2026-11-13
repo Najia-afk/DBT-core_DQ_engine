@@ -1,0 +1,21 @@
+mdm_elt:
+  target: run
+  outputs:
+    run:
+      type: duckdb
+      path: "{{ env_var('MDM_DUCKDB_PATH') }}"
+      threads: <<dbt_threads>>
+      extensions: [postgres]
+      module_paths: ['<<module_path>>']
+      plugins:
+        - module: engine.lanes.elt.dbtplugin
+      settings:
+        memory_limit: '<<memory_limit>>'
+        threads: <<threads>>
+        TimeZone: UTC
+        temp_directory: '<<temp_directory>>'
+        preserve_insertion_order: false
+      attach:
+        - path: "{{ env_var('MDM_PG_CONN') }}"
+          alias: pg
+          type: postgres

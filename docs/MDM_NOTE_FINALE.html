@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Note finale de l'étude MDM : architectures ETL, ELT et graphe, réconciliation delta, résultats mesurés et gaps avant production.">
+  <title>MDM maison — Note finale d’architecture et de résultats</title>
+  <style>
+    :root { --ink:#182b3e; --muted:#536779; --line:#dce4eb; --paper:#fff;
+      --bg:#f2f5f8; --blue:#175c86; --green:#17664c; --amber:#8c560a; --red:#9c3333; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--bg); color:var(--ink);
+      font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    a { color:var(--blue); text-underline-offset:3px; }
+    a:focus-visible,button:focus-visible { outline:3px solid #d29c33; outline-offset:4px; }
+    .skip { position:absolute; top:-80px; left:20px; background:white; padding:12px; z-index:5; }
+    .skip:focus { top:10px; }
+    header { color:white; background:#142b40; padding:55px max(24px,calc((100% - 1100px)/2)); }
+    header .label { color:#a9d4e6; text-transform:uppercase; letter-spacing:.14em; font-size:12px; }
+    h1 { font-size:clamp(30px,4vw,48px); line-height:1.15; max-width:900px; margin:14px 0 20px; }
+    header p { color:#d6e2eb; max-width:880px; font-size:18px; }
+    .meta { display:flex; flex-wrap:wrap; gap:10px; font-size:13px; }
+    .meta span { border:1px solid #446078; border-radius:5px; padding:5px 10px; }
+    nav { background:white; border-bottom:1px solid var(--line); }
+    nav .inner { max-width:1148px; margin:auto; padding:15px 24px; display:flex; gap:20px; flex-wrap:wrap; align-items:center; }
+    nav a { font-size:14px; text-decoration:none; }
+    button { margin-left:auto; border:1px solid var(--line); border-radius:5px; background:white;
+      color:var(--ink); padding:8px 12px; cursor:pointer; font:inherit; font-size:13px; }
+    main { max-width:1148px; margin:auto; padding:30px 24px 50px; }
+    section { margin-bottom:34px; scroll-margin-top:20px; }
+    h2 { font-size:27px; line-height:1.3; margin:0 0 17px; }
+    h2 .num { color:var(--blue); font-size:14px; vertical-align:middle; margin-right:12px; }
+    h3 { font-size:19px; line-height:1.4; margin:24px 0 10px; }
+    p { margin:10px 0; }
+    .panel,.card { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:25px; }
+    .callout { border-left:4px solid var(--blue); background:#eaf2f8; padding:16px 20px; border-radius:4px; margin:18px 0; }
+    .callout.warn { border-color:#b78329; background:#fff6e7; }
+    .callout.fail { border-color:var(--red); background:#fff0ef; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+    .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:22px 0; }
+    .kpi { background:white; padding:20px; border:1px solid var(--line); border-radius:8px; }
+    .kpi strong { display:block; font-size:30px; color:var(--blue); line-height:1.25; margin-bottom:8px; }
+    .kpi span,.small { font-size:13px; color:var(--muted); }
+    .tag { display:inline-block; font-size:12px; font-weight:650; padding:3px 9px; border-radius:4px; }
+    .ok { background:#e6f4ed; color:var(--green); }
+    .warning { background:#fff0d6; color:var(--amber); }
+    .failed { background:#fce4e2; color:var(--red); }
+    .neutral { background:#e8eff5; color:var(--blue); }
+    .card h3 { margin-top:10px; }
+    .card ul { padding-left:20px; font-size:14px; }
+    .box { border:1px solid #c6d7e5; border-radius:6px; background:#f6f9fc; padding:12px 10px; text-align:center; font-size:14px; }
+    .box b { display:block; }
+    .arrow { text-align:center; color:var(--blue); font-size:22px; line-height:1.5; }
+    .flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:20px 0; }
+    .flow .box { border-top:3px solid var(--blue); text-align:left; }
+    .flow .box span { display:block; font-size:12px; color:var(--muted); margin-top:5px; }
+    .diagram { overflow:auto; background:#f6f9fc; border:1px solid var(--line); border-radius:8px; padding:16px; }
+    svg { display:block; width:100%; height:auto; min-width:660px; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:8px; background:white; margin:15px 0; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    caption { text-align:left; padding:13px 16px; color:var(--muted); font-size:13px; }
+    th { text-align:left; background:#eaf0f5; font-weight:650; }
+    th,td { padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+    tbody tr:last-child td { border-bottom:0; }
+    .numeric { white-space:nowrap; font-variant-numeric:tabular-nums; }
+    pre { padding:18px; background:#142b40; color:#eef6fb; border-radius:6px; overflow:auto; font-size:13px; line-height:1.7; }
+    code { font-family:Consolas,"Liberation Mono",monospace; font-size:.9em; }
+    ol,ul { padding-left:23px; }
+    li { margin:6px 0; }
+    .split { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .bar-row { display:grid; grid-template-columns:70px 1fr 80px; align-items:center; gap:12px; margin:12px 0; font-size:14px; }
+    .bar-track { background:#e7edf3; height:20px; border-radius:4px; }
+    .bar { height:100%; background:var(--blue); border-radius:4px; }
+    .bar.alt { background:#7894aa; }
+    footer { border-top:1px solid var(--line); padding:23px; color:var(--muted); font-size:13px; text-align:center; }
+    @media(max-width:800px) { .grid,.split { grid-template-columns:1fr; } .kpis,.flow { grid-template-columns:1fr 1fr; }
+      .panel,.card { padding:18px; } h2 { font-size:23px; } header { padding-top:35px; } }
+    @media(max-width:460px) { .kpis,.flow { grid-template-columns:1fr; } }
+    @media print {
+      @page { size:A4; margin:15mm; }
+      body { background:white; font-size:10pt; line-height:1.45; color:#111; }
+      header { background:white; color:#111; padding:0 0 15px; border-bottom:2px solid #175c86; }
+      header p,header .label { color:#34495e; }
+      h1 { font-size:28pt; } h2 { font-size:18pt; } h3 { font-size:13pt; }
+      nav,.skip { display:none; } main { padding:22px 0 0; }
+      .meta span { border-color:#bbb; } .panel,.card { padding:14px; }
+      .grid { grid-template-columns:1fr; } .split { grid-template-columns:1fr; }
+      .kpis { grid-template-columns:repeat(4,1fr); } .kpi { padding:10px; } .kpi strong { font-size:20pt; }
+      .card,.kpi,.diagram,.callout { break-inside:avoid; }
+      h2,h3 { break-after:avoid; } tr { break-inside:avoid; } thead { display:table-header-group; }
+      .table-wrap,.diagram { overflow:visible; } table { font-size:9pt; } th,td { padding:7px; }
+      svg { min-width:0; } pre { white-space:pre-wrap; color:#111; background:#f1f4f7; }
+      a { color:#174b6b; } footer { margin-top:15px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#synthese">Aller au contenu</a>
+  <header>
+    <div class="label">Note finale · Architecture &amp; expérimentation</div>
+    <h1>MDM maison : réconcilier le delta,<br>pas reconstruire les référentiels.</h1>
+    <p>Comparaison de trois voies configurables — ETL, ELT et graphe — pour un objectif
+      de 50 référentiels par jour, chacun d’environ 1 million de nœuds et 200 attributs.</p>
+    <div class="meta"><span>13 novembre 2026</span><span>Données synthétiques locales</span>
+      <span>Étude de laboratoire · production non certifiée</span></div>
+  </header>
+  <nav aria-label="Sommaire">
+    <div class="inner">
+      <a href="#synthese">Synthèse</a><a href="#delta">Moteur delta</a><a href="#architectures">Architectures</a>
+      <a href="#resultats">Résultats</a><a href="#configuration">Configuration</a><a href="#gaps">Gaps</a>
+      <a href="#decision">Décision</a><a href="#preuves">Preuves</a>
+      <button type="button" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+  </nav>
+  <main>
+    <section id="synthese">
+      <h2><span class="num">01</span>Ce que l’étude permet de conclure</h2>
+      <div class="panel">
+        <p><strong>ETL vectorisée + PostgreSQL est la candidate principale dans les essais disponibles.</strong>
+          Elle a passé le jeu de 1 M de nœuds synthétiques et 200 attributs cibles, puis deux cycles
+          de changements. L’ELT est comparable à petite taille, mais échoue à 300 k × 200.
+          La voie graphe est hybride et n’est pas validée au volume cible.</p>
+        <p>La valeur du moteur est son <strong>enchaînement incrémental</strong> :
+          intégrer et contrôler une source, détecter ses modifications, réconcilier seulement les
+          stagings affectés, puis publier uniquement les changements golden.</p>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><strong>19 min</strong><span>ETL initial · ingest + reconcile<br>1 M nœuds × 200 attributs cibles</span></div>
+        <div class="kpi"><strong>4 min 16 s</strong><span>Cycle ETL à 5 % de mises à jour<br>même jeu et même état persistant</span></div>
+        <div class="kpi"><strong>8,1 Gio</strong><span>Pic mesuré client + PostgreSQL<br>essai ETL au volume cible</span></div>
+        <div class="kpi"><strong>17 Gio</strong><span>Somme des plafonds Docker<br>pile worker + état + metadata</span></div>
+      </div>
+      <div class="callout warn"><strong>Ne pas confondre un essai réussi et une capacité de production.</strong>
+        Les 50 référentiels/jour ne sont pas certifiés : pas de recette répétée sur 50 états durables,
+        pas de connecteurs métier réels, migrations et garanties d’exploitation encore incomplètes.</div>
+    </section>
+
+    <section id="delta">
+      <h2><span class="num">02</span>Architecture logique : le delta comme unité de travail</h2>
+      <div class="flow" aria-label="Les quatre étapes du moteur">
+        <div class="box"><b>1 · Ingest &amp; DQ</b><span>Mapping, normalisation, type, checks. Original et anomalies ne doivent pas être masqués.</span></div>
+        <div class="box"><b>2 · Merge source</b><span>Clé source stable + row_hash. Émettre I / U / D admissibles, rien si inchangé.</span></div>
+        <div class="box"><b>3 · Reconcile</b><span>Blocking, scores, ambiguïtés ; recalcul des seuls stagings affectés.</span></div>
+        <div class="box"><b>4 · Survie &amp; publish</b><span>Valeur et provenance par attribut ; golden_delta ; commit cohérent.</span></div>
+      </div>
+      <div class="split">
+        <div class="panel">
+          <h3>Invariants de données</h3>
+          <ul>
+            <li>La clé <code>(source_id, source_key)</code> identifie le nœud source ; une mise à jour ne crée pas une nouvelle identité.</li>
+            <li>Hash identique : pas de delta ni de réconciliation de ce nœud.</li>
+            <li>Rejet DQ : conserver la dernière version valide, avec anomalie visible ; ne pas la présenter silencieusement comme fraîche.</li>
+            <li>Une absence retire une ligne seulement dans un snapshot <em>full</em> déclaré complet et admissible.</li>
+            <li>Une ambiguïté va en revue ; le score ne constitue pas une preuve d’identité.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Invariants de publication</h3>
+          <ul>
+            <li>Le delta peut toucher des voisins et leurs clusters : « affecté » n’est pas limité aux lignes entrantes.</li>
+            <li>Survie par attribut : priorité de source ou révision la plus récente, avec départage déterministe prévu par contrat.</li>
+            <li>Un attribut golden obligatoire sans valeur admissible bloque la publication de l’objet.</li>
+            <li>Valeurs, provenance et statuts inchangés : golden non réécrit.</li>
+            <li>Publication par transaction PostgreSQL ; rollback et replay après interruption.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="small"><strong>Nuance essentielle :</strong> les snapshots complets restent lus pour détecter le delta.
+        L’aval est incrémental ; ce n’est pas une extraction CDC. La propriété « incrémental = à froid »
+        porte sur le dernier état source admissible, pas sur les seuls fichiers bruts du dernier jour.</p>
+    </section>
+
+    <section id="architectures">
+      <h2><span class="num">03</span>Trois voies : où le calcul est réellement exécuté</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="tag ok">Candidate principale</span><h3>A · ETL vectorisée</h3>
+          <div class="box"><b>Sources PG / Parquet</b>Lecture en flux · lots Arrow</div><div class="arrow" aria-hidden="true">↓</div>
+          <div class="box"><b>Python · Arrow / numpy / rapidfuzz</b>DQ, normalisation, scoring, composantes, survie</div><div class="arrow" aria-hidden="true">↕</div>
+          <div class="box"><b>PostgreSQL</b>COPY, merge, index de blocking, jointures candidates, état et publication</div>
+          <ul><li>Ingest borné par lots ; survie vectorisée sur stagings affectés.</li>
+            <li>Pas de SQL à écrire pour le parcours nominal de configuration.</li>
+            <li>Transaction initiale et historique restent coûteux.</li></ul>
+          <p class="small">L’ETL n’est pas « Python seul » : PostgreSQL participe aux candidats et aux écritures.</p>
+        </article>
+        <article class="card">
+          <span class="tag failed">Grande taille bloquée</span><h3>B · ELT / DuckDB / dbt</h3>
+          <div class="box"><b>Brut PG / Parquet</b>Extraction / matérialisation de travail</div><div class="arrow" aria-hidden="true">↓</div>
+          <div class="box"><b>Config → projet dbt généré</b>DuckDB : DQ, hash, joins, scores, composantes et survie SQL</div><div class="arrow" aria-hidden="true">↓</div>
+          <div class="box"><b>PostgreSQL</b>COPY des résultats + commit de publication</div>
+          <ul><li>SQL compilé inspectable, DAG et durées par modèle.</li>
+            <li>dbt lancé en subprocess supervisé, non bloquant pour le runtime.</li>
+            <li>Coût fixe dbt et forte mémoire sur le plan large.</li></ul>
+          <p class="small">La limite mémoire DuckDB n’est pas une limite du RSS de l’arbre Python/dbt.</p>
+        </article>
+        <article class="card">
+          <span class="tag warning">Hybride · volume cible non validé</span><h3>C · Graphe / Apache AGE</h3>
+          <div class="box"><b>Python / Arrow</b>Ingest, DQ, hash ; attributs en tables typées</div><div class="arrow" aria-hidden="true">↕</div>
+          <div class="box"><b>AGE · PostgreSQL</b>Record / Block / Staging / Golden ; arêtes de candidats, MATCH, memberships</div><div class="arrow" aria-hidden="true">↕</div>
+          <div class="box"><b>Python + transaction PG/AGE</b>Scores, étiquetage des composantes, survie, publication</div>
+          <ul><li>Traversées du graphe pour candidats et adjacence.</li>
+            <li>Charge utile des attributs hors agtype, en relationnel.</li>
+            <li>Lecture et survie pas entièrement bornées en lots.</li></ul>
+          <p class="small">Ce n’est ni un moteur graphe pur ni une implémentation totalement indépendante de l’oracle.</p>
+        </article>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>Comparaison des surfaces de calcul — même contrat logique, implémentations distinctes.</caption>
+          <thead><tr><th scope="col">Surface</th><th scope="col">ETL</th><th scope="col">ELT</th><th scope="col">Graphe</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Candidats</th><td>Index et joins PostgreSQL</td><td>Joins DuckDB</td><td>Blocking et traversées AGE</td></tr>
+            <tr><th scope="row">Scores</th><td>rapidfuzz / Arrow</td><td>SQL ; UDF Unicode ciblé</td><td>Python sur candidats du graphe</td></tr>
+            <tr><th scope="row">Composantes</th><td>numpy, ensemble affecté</td><td>Calcul SQL, propagation des labels</td><td>Adjacence AGE, labels Python</td></tr>
+            <tr><th scope="row">Survie</th><td>Vectorisée par lots de stagings</td><td>SQL généré</td><td>Python / Arrow</td></tr>
+            <tr><th scope="row">Publication</th><td>Transaction PostgreSQL</td><td>COPY + transaction PostgreSQL</td><td>Transaction PostgreSQL / AGE</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Pas de LLM, embedding ou service d’IA externe dans les règles du moteur.
+        Les seuils et le blocking doivent être calibrés sur la population métier.</p>
+    </section>
+
+    <section id="execution">
+      <h2><span class="num">04</span>Architecture d’exécution : async, admission et Docker</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 960 285" role="img" aria-labelledby="runtime-title runtime-desc">
+          <title id="runtime-title">Soumission, file persistante et workers supervisés</title>
+          <desc id="runtime-desc">La CLI soumet un run à pg-meta. Les workers asyncio réclament des steps sous budgets.
+            Les processus ETL ou ELT publient dans PostgreSQL. Airflow est une intégration de production non livrée.</desc>
+          <defs><marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0 0 L8 4 L0 8" fill="#175c86"/></marker></defs>
+          <g fill="#fff" stroke="#b7cad9" stroke-width="1.5">
+            <rect x="15" y="35" width="170" height="68" rx="6"/><rect x="240" y="35" width="205" height="68" rx="6"/>
+            <rect x="500" y="35" width="215" height="68" rx="6"/><rect x="770" y="35" width="175" height="68" rx="6"/>
+            <rect x="240" y="178" width="205" height="68" rx="6" stroke-dasharray="5 4"/>
+            <rect x="500" y="178" width="445" height="68" rx="6"/>
+          </g>
+          <g fill="#182b3e" font-family="system-ui, sans-serif" font-size="15" text-anchor="middle">
+            <text x="100" y="62" font-weight="650">CLI / ingénieur</text><text x="100" y="86" font-size="12">Config + clé d’idempotence</text>
+            <text x="342" y="62" font-weight="650">pg-meta · 1 Gio</text><text x="342" y="86" font-size="12">Runs, steps, tentatives, quotas</text>
+            <text x="607" y="62" font-weight="650">Worker asyncio · 8 Gio</text><text x="607" y="86" font-size="12">Claims, budgets, heartbeat, retry</text>
+            <text x="857" y="62" font-weight="650">État PG · 8 Gio</text><text x="857" y="86" font-size="12">Merge, golden, historique</text>
+            <text x="342" y="204" font-weight="650">Airflow · non livré</text><text x="342" y="229" font-size="12">Calendriers et dépendances</text>
+            <text x="722" y="204" font-weight="650">Processus de voie supervisés</text>
+            <text x="722" y="229" font-size="12">Timeout · RSS · arbre de processus · capture des résultats</text>
+          </g>
+          <g fill="none" stroke="#175c86" stroke-width="2" marker-end="url(#arrowhead)">
+            <path d="M185 69 H232"/><path d="M445 69 H492"/><path d="M715 69 H762"/>
+            <path d="M607 103 V170"/><path d="M342 178 V111" stroke-dasharray="5 4"/>
+          </g>
+          <text x="480" y="274" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#536779">
+            Diagramme de la pile ETL / ELT livrée — AGE utilise son déploiement séparé.
+          </text>
+        </svg>
+      </div>
+      <div class="split">
+        <div class="panel"><h3>Garanties livrées et testées</h3>
+          <ul><li>File PostgreSQL persistante ; claim <code>FOR UPDATE SKIP LOCKED</code> en transaction courte.</li>
+            <li>Ingest des sources parallélisable sous quotas ; reconcile après tous les ingests.</li>
+            <li>Un run actif par référentiel ; autres référentiels concurrents.</li>
+            <li>Idempotence de soumission, heartbeat, génération de tentative, timeout, annulation et retry borné.</li>
+            <li>Un lot bloqué apparaît comme avertissement, même avec un code de sortie 0.</li></ul>
+        </div>
+        <div class="panel"><h3>Limites et périmètre de la mémoire</h3>
+          <p><strong>Déploiement intégral :</strong> 1 + 8 + 8 = 17 Gio de plafonds conteneurs,
+            descendants du worker inclus, swap désactivé pour ces conteneurs.</p>
+          <p><strong>Banc historique :</strong> bases Docker, clients sur Windows ; RSS échantillonné,
+            pas de plafond OS instantané pour ces clients.</p>
+          <p>Le pic de travail ETL de 8,1 Gio ne représente pas la mémoire de Windows entier.
+            Autres usages et cache Docker compris, l’hôte a atteint 36,3 Gio sur ce run,
+            et 56,7 Gio lors de l’essai ELT interrompu.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultats">
+      <h2><span class="num">05</span>Résultats mesurés — succès et échecs conservés</h2>
+      <div class="table-wrap"><table>
+        <caption>Temps ingest + reconcile ; hors génération des sources, export et restauration d’état.
+          « Nœuds » = population synthétique latente ; environ 1,9 ligne source par nœud à trois sources.</caption>
+        <thead><tr><th scope="col">Voie / population</th><th scope="col">Initial</th><th scope="col">Cycle à 5 %</th><th scope="col">Pic client + PG</th><th scope="col">Résultat</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">ETL · 100 k × 50</th><td class="numeric">35,8 s</td><td class="numeric">8,7 s</td><td class="numeric">1,3 Gio</td><td><span class="tag ok">Mesuré · succès</span></td></tr>
+          <tr><th scope="row">ELT · 100 k × 50</th><td class="numeric">74,3 s</td><td class="numeric">30,8 s</td><td class="numeric">2,6 Gio</td><td><span class="tag ok">Mesuré · succès</span></td></tr>
+          <tr><th scope="row">ETL · 300 k × 200</th><td class="numeric">241,6 s</td><td class="numeric">36,7 s</td><td class="numeric">4,8 Gio</td><td><span class="tag ok">Mesuré · succès</span></td></tr>
+          <tr><th scope="row">ETL · 1 M × 200</th><td class="numeric">1 136,9 s<br>≈ 19 min</td><td class="numeric">255,8 s<br>≈ 4 min 16 s</td><td class="numeric">8,1 Gio</td><td><span class="tag ok">Mesuré · succès</span></td></tr>
+          <tr><th scope="row">ELT · 300 k × 200</th><td>Non terminé</td><td>Non mesuré</td><td class="numeric">28,0 Gio<br>puis 22,4 Gio</td><td><span class="tag failed">Arrêt RAM, puis 90 min</span></td></tr>
+          <tr><th scope="row">Graphe · 1 M × 200</th><td>Non mesuré</td><td>Non mesuré</td><td>Non mesuré</td><td><span class="tag warning">Non validé</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="split">
+        <div class="panel">
+          <h3>Comparaison à taille commune</h3>
+          <p class="small">Initial à 100 k × 50 · secondes · même jeu synthétique.</p>
+          <div class="bar-row"><span>ETL</span><div class="bar-track"><div class="bar" style="width:48.2%"></div></div><b>35,8 s</b></div>
+          <div class="bar-row"><span>ELT</span><div class="bar-track"><div class="bar alt" style="width:100%"></div></div><b>74,3 s</b></div>
+          <p>Ce constat ne permet pas un classement universel. Le coût fixe dbt pèse sur les petits
+            deltas ; la largeur, les candidats et les plans modifient le comportement à grande taille.</p>
+        </div>
+        <div class="panel">
+          <h3>Détail ETL au volume cible</h3>
+          <ul><li>Initial : 1 900 732 lignes lues ; 1 881 296 nœuds du delta.</li>
+            <li>Ingest initial : 348,74 s ; reconcile : 788,18 s.</li>
+            <li>Cycle à 1 % : 176,36 s ; cycle à 5 % : 255,78 s.</li>
+            <li>État final : 12,2 Gio ; pic PGDATA, WAL inclus : 21,2 Gio.</li>
+            <li>PG plafonné à 8 Gio, lots de 25 k, ingests séquentiels.</li></ul>
+          <p class="small"><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/etl-L3-final.json">Preuve : JSON du run ETL au volume cible.</a></p>
+        </div>
+      </div>
+      <div class="callout fail"><strong>Échec ELT à grande taille : pas d’extrapolation favorable.</strong>
+        À 300 k × 200, un premier essai a été arrêté au budget RAM ; un second a dépassé
+        90 minutes de reconcile. Le nouveau cycle n’a pas été publié. Le succès à 100 k × 50
+        ne valide donc pas une capacité à 1 M × 200.</div>
+      <h3>Équivalence et async réel</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th scope="col">Recette</th><th scope="col">Observation</th><th scope="col">Limite de la preuve</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Trois voies contre oracle · 2 k × 30</th><td>J0/J1/J2 : états, événements et hashes égaux lors de la recette.</td><td>Fonctions partagées avec l’oracle ; pas de précision/rappel métier. Journaux de runs disponibles ; le JSON agrégé de comparaison n’est plus présent dans le dépôt à la rédaction de cette note.</td></tr>
+          <tr><th scope="row">ETL contre ELT · 100 k × 50</th><td>Projections et hashes égaux après cycles à 1/5/20 %.</td><td>Pas de comparaison des trois voies au volume cible.</td></tr>
+          <tr><th scope="row">Runtime ETL · 3 × 20 k × 30</th><td>36,08 s avec un slot → 14,84 s avec trois slots ; gain ×2,43.</td><td>Petit volume ; gain non transposable automatiquement à 1 M × 200.</td></tr>
+          <tr><th scope="row">Runtime ELT · 3 × 20 k × 30</th><td>149,06 s → 55,18 s ; gain ×2,70.</td><td>Trois steps observés ; même référentiel sérialisé ; compteurs finaux égaux.</td></tr>
+          <tr><th scope="row">Package et pile Docker</th><td>741 tests passent dans 4 Gio ; 111 tests de bases externes ignorés. Runtime PG réel : 75 tests passent. Smoke intégral : 11 exports.</td><td>Comptages de périmètres distincts, non additionnés comme score de conformité. Deux avertissements fork observés.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Conditions des mesures</h3>
+      <p>Windows, 32 threads, environ 64 Gio de RAM ; Python 3.12, DuckDB 2.0.0,
+        dbt Core 1.12.7 / dbt-duckdb 1.11.1, PostgreSQL 16.4, AGE 1.6.0/PG16.
+        Sources Parquet déjà accessibles. Les fichiers JSON conservent versions, réglages,
+        graines, empreintes de configuration, compteurs et commandes.</p>
+      <p class="small">Une exécution par taille/configuration : ni p95, ni intervalle de confiance,
+        ni répétition froid/chaud contrôlée. Toutes les sources ne renseignent pas les 200 attributs :
+        ce n’est pas un test de 200 valeurs non nulles par ligne. Les benchmarks utilisent
+        <code>synchronous_commit=off</code>, <code>fsync</code> actif ; la durabilité à
+        l’acquittement est donc moindre que dans une recette de production à confirmer.</p>
+    </section>
+
+    <section id="configuration">
+      <h2><span class="num">06</span>Le parcours de l’ingénieur data : brancher, mapper, ordonner</h2>
+      <div class="split">
+        <div class="panel"><h3>Configuration illustrative d’un attribut</h3>
+          <pre><code># Extrait, pas une configuration complète
+attributes:
+  - name: email
+    type: string
+    nullable: true
+    normalize: [trim, lower]
+    strategy: priority
+    sources:
+      - {source: crm, column: EMAIL}
+      - {source: web, column: email}
+    checks:
+      - rule: regex
+        value: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+        on_fail: null_value</code></pre>
+          <p class="small">Priorité : première valeur non nulle admissible, CRM puis web.
+            Si toutes les valeurs sont nulles : null autorisé ici.
+            <code>nullable: false</code> bloquerait le golden sans valeur admissible.</p>
+        </div>
+        <div class="panel"><h3>Workflow livré</h3>
+          <ol><li>Déclarer la source, la clé, la révision et full/delta.</li>
+            <li>Mapper chaque colonne ; insérer la source à la position de survie souhaitée.</li>
+            <li>Déclarer normalisation, checks, blocking, scores et contradictions.</li>
+            <li><code>validate</code> puis <code>explain</code> pour contrôler la définition.</li>
+            <li><code>check-source</code> pour profiler colonnes, casts, clés et erreurs.</li>
+            <li>Soumettre un run avec clé d’idempotence stable ; consulter son résultat.</li></ol>
+          <p><code>add-source --dry-run</code> montre le diff avant écriture.
+            DSN et secrets restent hors YAML.</p>
+          <p class="small">Distincts par attribut estimés et étiquetés sous DuckDB ; unicité de clé exacte.
+            <a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/ENGINEER_GUIDE.md">Guide opératoire et options détaillées.</a></p>
+        </div>
+      </div>
+      <div class="callout warn"><strong>« Tout en config » a une frontière explicite.</strong>
+        Les connecteurs et primitives supportés sont configurables. Une nouvelle famille
+        de connecteur, une nouvelle règle métier ou l’évolution du schéma physique peut encore
+        demander du code. Ajouter un attribut au YAML n’effectue pas sa migration de tables.</div>
+    </section>
+
+    <section id="dimensionnement">
+      <h2><span class="num">07</span>50 référentiels/jour : potentiel mesuré, capacité non certifiée</h2>
+      <div class="panel">
+        <p>L’objectif représente <strong>50 M de nœuds et jusqu’à 10 milliards de valeurs
+          d’attributs/jour</strong>, avant candidats, relations, alternatives et historique.
+          Une fenêtre de six heures — hypothèse de dimensionnement, pas SLA validé —
+          exige environ <strong>2 315 nœuds/s agrégés</strong>.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th scope="col">Calcul de planification</th><th scope="col">Ordre de grandeur</th><th scope="col">Statut</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">50 cycles semblables au delta ETL à 5 %</th><td>50 × 255,78 s ≈ 3 h 33 min, séquentiel</td><td><span class="tag warning">Calcul, pas recette de 50 runs</span></td></tr>
+            <tr><th scope="row">50 chargements initiaux semblables</th><td>50 × 1 136,92 s ≈ 15 h 47 min, séquentiel</td><td>Initial et quotidien ne sont pas interchangeables.</td></tr>
+            <tr><th scope="row">Stockage de 50 états comparables</th><td>Environ 0,6 Tio d’état ; sauvegardes, WAL, temporaire et rétention en sus</td><td>Extrapolation ; non hébergée durablement lors de la recette.</td></tr>
+          </tbody>
+        </table></div>
+        <p>Le résultat ETL justifie un approfondissement, pas une promesse de débit universel.
+          Les gros blocs, les relations, la largeur réelle, la proportion de changements et
+          la croissance de l’historique peuvent changer le coût. Trois runs parallèles
+          partagent le disque, PostgreSQL, le cache et la mémoire ; le gain ×3 n’est pas acquis.</p>
+      </div>
+    </section>
+
+    <section id="gaps">
+      <h2><span class="num">08</span>Exigences du moteur et gaps avant exploitation</h2>
+      <div class="table-wrap"><table>
+        <caption>Les écarts sont des travaux restant à réaliser ; leur documentation ne les corrige pas.</caption>
+        <thead><tr><th scope="col">Exigence</th><th scope="col">Livré / observé</th><th scope="col">Gap à fermer</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Delta correct et stable</th><td>Merge, DQ, replay et écritures inchangées testés.</td><td><strong>Encodage de hash non injectif pour certains caractères de contrôle.</strong> Canonicalisation versionnée, tests adversariaux et migration nécessaires.</td></tr>
+          <tr><th scope="row">Déterminisme / parité</th><td>Comparaisons communes passées.</td><td>Doublons à révision égale dépendants de l’ordre ; différences re/RE2, casse Unicode et zéro décimal signé.</td></tr>
+          <tr><th scope="row">Config évolutive</th><td>Schéma strict, mapping, survie et CLI.</td><td>Migrations de tables et de configuration versionnées ; pas de migration automatique lors d’un ajout de champ.</td></tr>
+          <tr><th scope="row">Mémoire bornée</th><td>Ingest ETL en flux ; admission, surveillance ; plafonds Docker.</td><td>ELT grande taille bloqué ; graphe pas entièrement en lots ; limite DuckDB ≠ RSS.</td></tr>
+          <tr><th scope="row">Reprise / publication</th><td>Transactions PG, rollback, idempotence, tests kill.</td><td>Fencing effectif côté cible, suivi des sessions, reprise multi-hôtes ; transaction initiale longue.</td></tr>
+          <tr><th scope="row">Extraction incrémentale</th><td>PG/Parquet, full/delta et barrière de complétude.</td><td>Catalogue durable des fichiers, watermarks, CDC/Airbyte et connecteurs réels.</td></tr>
+          <tr><th scope="row">Historique et stockage</th><td>Provenance, deltas source/golden, événements de staging.</td><td>Partitionnement, rétention, purge, capacité disque et création initiale compacte à étudier.</td></tr>
+          <tr><th scope="row">MDM métier complet</th><td>Identités, attributs, memberships, revue persistée.</td><td>Réconciliation générique d’épisodes de relations métier ; arbitrages autorisés et versionnés ; UI steward.</td></tr>
+          <tr><th scope="row">Moteur Python/dbt de la spec</th><td>Sous-ensemble vertical async, claims, tentatives et budgets.</td><td>Quotas tenant, cibles/connexions, disque par step, API HTTP et garanties globales.</td></tr>
+          <tr><th scope="row">Production on-prem</th><td>Déploiement Docker non root, DSN hors YAML, bases sans ports publiés.</td><td>Airflow deferrable, Airbyte, OIDC/RBAC, isolation tenant, audit, sauvegarde/restauration, HA.</td></tr>
+          <tr><th scope="row">50 × 1 M × 200/jour</th><td>ETL mesuré au volume cible ; petits essais concurrents.</td><td>Recette répétée sur vrais profils, stockage durable et durabilité requise ; pas de SLA certifié.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="decision">
+      <h2><span class="num">09</span>Recommandation finale et conditions de passage</h2>
+      <div class="callout"><strong>Décision conditionnelle : poursuivre ETL/Arrow + PostgreSQL comme socle candidat.</strong>
+        Garder l’ELT comme alternative instrumentée jusqu’à correction de son comportement large ;
+        utiliser le graphe pour les liens et parcours dont le bénéfice métier et le coût sont prouvés.</div>
+      <div class="panel">
+        <ol>
+          <li><strong>Fermer les risques de correction :</strong> hash injectif/versionné, doublons stables,
+            parité Unicode et décimale, migration et replay contrôlé.</li>
+          <li><strong>Fixer le profil réel :</strong> lignes par source, 200 attributs réellement renseignés ou non,
+            largeur, candidats, relations, deltas, qualité, rétention et fenêtre de fraîcheur.</li>
+          <li><strong>Durcir l’exploitation :</strong> migrations, manifeste des sources, publication/fencing,
+            stockage dimensionné, sauvegardes, supervision et droits.</li>
+          <li><strong>Répéter la recette :</strong> au moins trois essais au volume cible, durabilité requise,
+            conditions froid/chaud explicites et concurrence de gros référentiels.</li>
+          <li><strong>Brancher les services de production :</strong> opérateur Airflow deferrable,
+            connecteurs réels et gouvernance des décisions steward.</li>
+        </ol>
+        <p><strong>Livrable actuel :</strong> un laboratoire MDM configurable exécutable et une étude de ses limites.
+          <strong>Pas encore :</strong> un MDM de production complet et certifié.</p>
+      </div>
+    </section>
+
+    <section id="preuves">
+      <h2><span class="num">10</span>Sources, preuves et reproduction</h2>
+      <div class="split">
+        <div class="panel"><h3>Documents de référence</h3>
+          <ul><li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/MDM_STUDY.md">Étude complète et matrice des exigences</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/MDM_CONTRACT.md">Contrat MDM commun</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/SPECIFICATIONS.md">Specification du moteur de pipelines</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/ENGINEER_GUIDE.md">Guide de l’ingénieur data</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/FINDINGS.md">Échecs et gaps conservés</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/deploy/README.md">Déploiement Docker et smoke reproductible</a></li></ul>
+        </div>
+        <div class="panel"><h3>Données de recette</h3>
+          <ul><li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/RESULTS.md">Résultats détaillés, versions, configs et commandes</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/etl-L3-final.json">ETL · 1 M × 200 · données brutes</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/elt-L2.json">ELT · arrêt RAM</a> / <a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/elt-L2-retry1.json">arrêt timeout</a></li>
+            <li>Runs de recette à 2 k :
+              <a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/equiv-etl-2k.json">ETL</a> /
+              <a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/equiv-elt-2k.json">ELT</a> /
+              <a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/runs/equiv-graph-2k.json">graphe</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/equivalence/lanes-L1.json">Comparaison ETL contre ELT à 100 k</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/concurrency/etl-3x20k.json">Concurrence ETL</a> /
+              <a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/docs/bench/concurrency/elt-3x20k.json">concurrence ELT</a></li>
+            <li><a href="https://github.com/Najia-afk/DBT-core_DQ_engine/blob/main/engine/bench/README.md">Commandes du banc et garde-fous</a></li></ul>
+        </div>
+      </div>
+      <p class="small">Note autonome : aucun CDN, script distant ou police externe.
+        Les schémas sont des représentations d’architecture, pas des captures de résultats.
+        Le contenu reste lisible sans JavaScript ; le bouton d’impression est facultatif.
+        Les liens de preuves pointent vers GitHub et nécessitent un accès au dépôt.
+        Dans les preuves publiées, &lt;USER_HOME&gt; remplace le chemin du profil local ;
+        ce masquage ne modifie ni les mesures ni les résultats.</p>
+    </section>
+  </main>
+  <footer>MDM maison · Note finale du 13 novembre 2026 · Mesuré ≠ extrapolé ≠ certifié</footer>
+</body>
+</html>

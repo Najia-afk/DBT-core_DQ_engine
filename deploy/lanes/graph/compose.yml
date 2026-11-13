@@ -1,0 +1,33 @@
+name: mdm2-graph
+
+# Local AGE server for the graph lane. Nothing here is started by the tests or by the lane:
+# the tests / smoke / bench start their own `mdm2-graph-*` containers with the same limits.
+services:
+  age:
+    image: apache/age:release_PG16_1.6.0
+    container_name: mdm2-graph-dev
+    environment:
+      POSTGRES_USER: mdm
+      POSTGRES_PASSWORD: ${MDM_GRAPH_PASSWORD:?set MDM_GRAPH_PASSWORD}
+      POSTGRES_DB: mdm_state
+    command:
+      - postgres
+      - -c
+      - shared_buffers=1GB
+      - -c
+      - max_wal_size=4GB
+      - -c
+      - max_connections=60
+    ports:
+      - "127.0.0.1:${MDM_GRAPH_PORT:-55432}:5432"
+    mem_limit: 6g
+    memswap_limit: 6g
+    shm_size: 512m
+    # Data directory: Docker anonymous volume (removed by `docker compose down -v`).
+    # For a throw-away dev server use tmpfs instead (data lost on stop):
+    # tmpfs: ["/var/lib/postgresql/data:rw,size=2g"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm_state"]
+      interval: 3s
+      timeout: 3s
+      retries: 30

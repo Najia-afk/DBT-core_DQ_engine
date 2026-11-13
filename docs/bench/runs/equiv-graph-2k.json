@@ -1,0 +1,987 @@
+{
+ "schema": 1,
+ "name": "equiv-graph-2k",
+ "lane": "graph",
+ "status": "ok",
+ "abort_reason": null,
+ "machine": {
+  "date": "2026-11-13T15:48:26+01:00",
+  "os": "Windows-11-10.0.26300-SP0",
+  "cpu_threads": 32,
+  "ram_gb": 63.7,
+  "python": "3.12.10",
+  "duckdb": "2.0.0",
+  "pyarrow": "26.0.1",
+  "psycopg": "3.3.6",
+  "numpy": "2.5.4",
+  "rapidfuzz": "3.14.6",
+  "dbt-core": "1.12.7",
+  "dbt-duckdb": "1.11.1",
+  "docker_server": "29.1.3",
+  "docker_vm_mem_gb": 31.2,
+  "git_head": "90af100"
+ },
+ "pg_server": "16.10 (Debian 16.10-1.pgdg13+1)",
+ "pg_image": "apache/age:release_PG16_1.6.0",
+ "config": {
+  "hash": "331425cb73aa",
+  "nodes": 2000,
+  "attributes": 30,
+  "sources": 3,
+  "kinds": [
+   "parquet",
+   "parquet",
+   "parquet"
+  ],
+  "snapshots": [
+   "full",
+   "full",
+   "delta"
+  ],
+  "seed": 7,
+  "deltas": [
+   {
+    "update_pct": 8.0,
+    "new_pct": 4.0,
+    "delete_pct": 3.0,
+    "broken_pct": 2.0,
+    "merge_pct": 25.0,
+    "split_pct": 25.0
+   },
+   {
+    "update_pct": 8.0,
+    "new_pct": 4.0,
+    "delete_pct": 3.0,
+    "broken_pct": 2.0,
+    "merge_pct": 25.0,
+    "split_pct": 25.0
+   }
+  ],
+  "days": 2,
+  "ingest_mode": "sequential",
+  "batch_rows": "config (50000)",
+  "elt_memory_limit": null,
+  "elt_threads": null,
+  "etl_workers": null,
+  "pg_tuning": {
+   "memory": "4g",
+   "shm_size": "1g",
+   "shared_buffers": "512MB",
+   "work_mem": "64MB",
+   "maintenance_work_mem": "1GB",
+   "effective_cache_size": "8GB",
+   "max_wal_size": "16GB",
+   "min_wal_size": "2GB",
+   "checkpoint_timeout": "30min",
+   "synchronous_commit": "off",
+   "max_connections": 100
+  },
+  "limits": {
+   "min_free_disk_gb": 25.0,
+   "max_step_seconds": 600.0,
+   "max_total_ram_gb": 12.0
+  }
+ },
+ "dataset": {
+  "key": "bbc33848591b",
+  "gen_wall_s": 7.6,
+  "gen_rss_peak_mb": 295.5,
+  "bytes": 1848537,
+  "rows_by_day": {
+   "0": 3761,
+   "1": 2730,
+   "2": 2762
+  },
+  "commands": [
+   "engine.core.synth generate --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b --days 0 --force --nodes 2000 --attributes 30 --sources 3 --seed 7 --referential bench --kinds parquet,parquet,parquet --snapshots full,full,delta --workers 4",
+   "engine.core.synth next-day --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b --workers 4 --update-pct 8.0 --new-pct 4.0 --delete-pct 3.0 --broken-pct 2.0 --merge-pct 25.0 --split-pct 25.0",
+   "engine.core.synth next-day --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b --workers 4 --update-pct 8.0 --new-pct 4.0 --delete-pct 3.0 --broken-pct 2.0 --merge-pct 25.0 --split-pct 25.0"
+  ]
+ },
+ "commands": [
+  "python -m engine.lanes.graph init --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source crm --run-id d0",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source erp --run-id d0",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source web --run-id d0",
+  "python -m engine.lanes.graph reconcile --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --run-id d0",
+  "python -m engine.lanes.graph export --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\exports\\equiv-graph-2k\\day0",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source crm --run-id d1",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source erp --run-id d1",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source web --run-id d1",
+  "python -m engine.lanes.graph reconcile --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --run-id d1",
+  "python -m engine.lanes.graph export --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\exports\\equiv-graph-2k\\day1",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source crm --run-id d2",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source erp --run-id d2",
+  "python -m engine.lanes.graph ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --source web --run-id d2",
+  "python -m engine.lanes.graph reconcile --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --run-id d2",
+  "python -m engine.lanes.graph export --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-bbc33848591b\\config.yml --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\exports\\equiv-graph-2k\\day2"
+ ],
+ "phases": [
+  {
+   "day": 0,
+   "phase": "init",
+   "wall_s": 0.99,
+   "rows": null,
+   "rows_per_s": null,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 46.2,
+   "rss_peak_mb": 52.5,
+   "container_mem_peak_mb": 81.2,
+   "container_cpu_peak_pct": 11.1,
+   "total_peak_mb": 133.7,
+   "host_used_peak_gb": 26.65,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 37840,
+     "cmd": "-m engine.lanes.graph init",
+     "rss_mb": 47.7
+    },
+    {
+     "pid": 42500,
+     "cmd": "-m engine.lanes.graph init",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 8.8,
+   "pgdata_mb": 47.2,
+   "wal_mb": 0.7,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-init",
+     "wall_s": 0.99,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "graph_created": true
+     }
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "day": 0,
+   "phase": "ingest",
+   "wall_s": 3.03,
+   "rows": 3761,
+   "rows_per_s": 1240.8,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 47.2,
+   "rss_peak_mb": 55.3,
+   "container_mem_peak_mb": 85.2,
+   "container_cpu_peak_pct": 7.0,
+   "total_peak_mb": 140.6,
+   "host_used_peak_gb": 26.63,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 40700,
+     "cmd": "-m engine.lanes.graph ingest",
+     "rss_mb": 50.6
+    },
+    {
+     "pid": 40848,
+     "cmd": "-m engine.lanes.graph ingest",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 12.0,
+   "pgdata_mb": 50.4,
+   "wal_mb": 4.2,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-ingest-crm",
+     "wall_s": 1.04,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1260,
+       "rejected_records": 2,
+       "duplicate_rows": 0,
+       "inserted": 1258,
+       "updated": 0,
+       "deleted": 0,
+       "unchanged": 0,
+       "blocked": false,
+       "vertices_created": 1258
+      },
+      "seconds": {
+       "read": 0.0082,
+       "transform": 0.1233,
+       "stage": 0.0596,
+       "merge": 0.0316,
+       "log": 0.0018
+      }
+     }
+    },
+    {
+     "label": "d0-ingest-erp",
+     "wall_s": 0.99,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1273,
+       "rejected_records": 1,
+       "duplicate_rows": 0,
+       "inserted": 1272,
+       "updated": 0,
+       "deleted": 0,
+       "unchanged": 0,
+       "blocked": false,
+       "vertices_created": 1272
+      },
+      "seconds": {
+       "read": 0.0085,
+       "transform": 0.0987,
+       "stage": 0.0611,
+       "merge": 0.0332,
+       "log": 0.001
+      }
+     }
+    },
+    {
+     "label": "d0-ingest-web",
+     "wall_s": 1.0,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1228,
+       "rejected_records": 4,
+       "duplicate_rows": 0,
+       "inserted": 1224,
+       "updated": 0,
+       "deleted": 0,
+       "unchanged": 0,
+       "blocked": false,
+       "vertices_created": 1224
+      },
+      "seconds": {
+       "read": 0.0089,
+       "transform": 0.0954,
+       "stage": 0.0602,
+       "merge": 0.0262,
+       "log": 0.0012
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "staged_files": {
+    "crm": 1,
+    "erp": 1,
+    "web": 1
+   }
+  },
+  {
+   "day": 0,
+   "phase": "reconcile",
+   "wall_s": 2.13,
+   "rows": 3754,
+   "rows_per_s": 1759.9,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 50.4,
+   "rss_peak_mb": 99.9,
+   "container_mem_peak_mb": 104.8,
+   "container_cpu_peak_pct": 42.6,
+   "total_peak_mb": 204.7,
+   "host_used_peak_gb": 26.69,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 41328,
+     "cmd": "-m engine.lanes.graph reconcile",
+     "rss_mb": 95.2
+    },
+    {
+     "pid": 6768,
+     "cmd": "-m engine.lanes.graph reconcile",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 23.4,
+   "pgdata_mb": 77.7,
+   "wal_mb": 11.6,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-reconcile",
+     "wall_s": 2.13,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "delta_nodes": 3754,
+       "rescored_nodes": 3754,
+       "pairs": 2198,
+       "pairs_removed": 0,
+       "affected_nodes": 3754,
+       "stagings": 2247,
+       "merges": 0,
+       "splits": 0,
+       "creates": 2247,
+       "retired": 0,
+       "golden_rows_written": 2247,
+       "golden_changes": 62285,
+       "blocks_touched": 4032,
+       "candidate_pairs": 2198,
+       "cypher_queries": 5,
+       "edges_IN_BLOCK": 7030,
+       "edges_MATCH": 2198,
+       "edges_MEMBER_OF": 3754,
+       "edges_PUBLISHED_AS": 2247,
+       "edges_REVIEW": 316,
+       "edges_updated_MATCH": 2130,
+       "oversized_blocks_logged": 0,
+       "pairs_decided": 2198,
+       "pairs_dropped": 0,
+       "survive_member_rows": 3754,
+       "vertices_Block": 4032,
+       "vertices_Golden": 2247,
+       "vertices_Staging": 2247
+      },
+      "seconds": {
+       "index": 0.3328,
+       "pairs": 0.1543,
+       "decide": 0.0895,
+       "recluster": 0.2228,
+       "survive": 0.4369,
+       "total": 1.2528
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "delta_nodes": 3754
+  },
+  {
+   "day": 0,
+   "phase": "export",
+   "wall_s": 1.67,
+   "rows": null,
+   "rows_per_s": null,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 77.7,
+   "rss_peak_mb": 87.1,
+   "container_mem_peak_mb": 123.6,
+   "container_cpu_peak_pct": 37.8,
+   "total_peak_mb": 210.7,
+   "host_used_peak_gb": 26.72,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 5424,
+     "cmd": "-m engine.lanes.graph export",
+     "rss_mb": 82.4
+    },
+    {
+     "pid": 42916,
+     "cmd": "-m engine.lanes.graph export",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 23.4,
+   "pgdata_mb": 77.7,
+   "wal_mb": 0.0,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-export",
+     "wall_s": 1.67,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "source_record": 3754,
+       "source_delta": 3754,
+       "reject": 16,
+       "anomaly": 0,
+       "staging": 2247,
+       "staging_event": 2247,
+       "golden_delta": 62285,
+       "golden": 2247,
+       "match_pair": 2198,
+       "review": 316,
+       "staging_member": 3754
+      },
+      "seconds": {
+       "read": 0.8875,
+       "write": 0.1003
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "export_mb": 2.1
+  },
+  {
+   "day": 1,
+   "phase": "ingest",
+   "wall_s": 2.88,
+   "rows": 2730,
+   "rows_per_s": 948.9,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 77.7,
+   "rss_peak_mb": 67.2,
+   "container_mem_peak_mb": 98.8,
+   "container_cpu_peak_pct": 4.6,
+   "total_peak_mb": 166.0,
+   "host_used_peak_gb": 26.76,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 5372,
+     "cmd": "-m engine.lanes.graph ingest",
+     "rss_mb": 62.5
+    },
+    {
+     "pid": 42248,
+     "cmd": "-m engine.lanes.graph ingest",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 23.8,
+   "pgdata_mb": 78.1,
+   "wal_mb": 0.8,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d1-ingest-crm",
+     "wall_s": 0.97,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1272,
+       "rejected_records": 27,
+       "duplicate_rows": 0,
+       "inserted": 50,
+       "updated": 101,
+       "deleted": 38,
+       "unchanged": 1094,
+       "blocked": false,
+       "vertices_created": 50
+      },
+      "seconds": {
+       "read": 0.0081,
+       "transform": 0.0974,
+       "stage": 0.0411,
+       "merge": 0.0207,
+       "log": 0.0011
+      }
+     }
+    },
+    {
+     "label": "d1-ingest-erp",
+     "wall_s": 0.98,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1286,
+       "rejected_records": 26,
+       "duplicate_rows": 0,
+       "inserted": 51,
+       "updated": 102,
+       "deleted": 38,
+       "unchanged": 1107,
+       "blocked": false,
+       "vertices_created": 51
+      },
+      "seconds": {
+       "read": 0.008,
+       "transform": 0.1021,
+       "stage": 0.0444,
+       "merge": 0.0212,
+       "log": 0.0012
+      }
+     }
+    },
+    {
+     "label": "d1-ingest-web",
+     "wall_s": 0.92,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 172,
+       "rejected_records": 25,
+       "duplicate_rows": 0,
+       "inserted": 49,
+       "updated": 97,
+       "deleted": 0,
+       "unchanged": 1,
+       "blocked": false,
+       "vertices_created": 49
+      },
+      "seconds": {
+       "read": 0.0081,
+       "transform": 0.0565,
+       "stage": 0.0408,
+       "merge": 0.0116,
+       "log": 0.0012
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "staged_files": {
+    "crm": 1,
+    "erp": 1,
+    "web": 1
+   }
+  },
+  {
+   "day": 1,
+   "phase": "reconcile",
+   "wall_s": 2.07,
+   "rows": 526,
+   "rows_per_s": 254.2,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 78.1,
+   "rss_peak_mb": 84.5,
+   "container_mem_peak_mb": 132.5,
+   "container_cpu_peak_pct": 87.6,
+   "total_peak_mb": 217.0,
+   "host_used_peak_gb": 26.78,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 45864,
+     "cmd": "-m engine.lanes.graph reconcile",
+     "rss_mb": 79.8
+    },
+    {
+     "pid": 42012,
+     "cmd": "-m engine.lanes.graph reconcile",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 25.0,
+   "pgdata_mb": 79.4,
+   "wal_mb": 2.0,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d1-reconcile",
+     "wall_s": 2.07,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "delta_nodes": 526,
+       "rescored_nodes": 526,
+       "pairs": 393,
+       "pairs_removed": 431,
+       "affected_nodes": 1022,
+       "stagings": 655,
+       "merges": 35,
+       "splits": 148,
+       "creates": 112,
+       "retired": 53,
+       "golden_rows_written": 651,
+       "golden_changes": 8832,
+       "blocks_touched": 1178,
+       "candidate_pairs": 393,
+       "cypher_queries": 13,
+       "edges_IN_BLOCK": 559,
+       "edges_MATCH": 393,
+       "edges_MEMBER_OF": 371,
+       "edges_PUBLISHED_AS": 260,
+       "edges_REVIEW": 225,
+       "edges_deleted_IN_BLOCK": 422,
+       "edges_deleted_MATCH": 431,
+       "edges_deleted_MEMBER_OF": 297,
+       "edges_deleted_REVIEW": 78,
+       "edges_updated_MATCH": 456,
+       "golden_retired": 53,
+       "oversized_blocks_logged": 0,
+       "pairs_decided": 656,
+       "pairs_dropped": 431,
+       "survive_member_rows": 946,
+       "vertices_Block": 348,
+       "vertices_Golden": 260,
+       "vertices_Staging": 260
+      },
+      "seconds": {
+       "index": 0.0899,
+       "pairs": 0.5043,
+       "decide": 0.3799,
+       "recluster": 0.0908,
+       "survive": 0.1254,
+       "total": 1.1988
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "delta_nodes": 526
+  },
+  {
+   "day": 1,
+   "phase": "export",
+   "wall_s": 1.4,
+   "rows": null,
+   "rows_per_s": null,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 79.4,
+   "rss_peak_mb": 82.9,
+   "container_mem_peak_mb": 154.4,
+   "container_cpu_peak_pct": 38.1,
+   "total_peak_mb": 237.3,
+   "host_used_peak_gb": 26.75,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 40912,
+     "cmd": "-m engine.lanes.graph export",
+     "rss_mb": 78.2
+    },
+    {
+     "pid": 38320,
+     "cmd": "-m engine.lanes.graph export",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 25.0,
+   "pgdata_mb": 79.4,
+   "wal_mb": 0.0,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d1-export",
+     "wall_s": 1.4,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "source_record": 3904,
+       "source_delta": 4280,
+       "reject": 101,
+       "anomaly": 0,
+       "staging": 2507,
+       "staging_event": 2542,
+       "golden_delta": 71117,
+       "golden": 2507,
+       "match_pair": 2160,
+       "review": 463,
+       "staging_member": 3828
+      },
+      "seconds": {
+       "read": 0.5855,
+       "write": 0.1173
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "export_mb": 2.3
+  },
+  {
+   "day": 2,
+   "phase": "ingest",
+   "wall_s": 2.87,
+   "rows": 2762,
+   "rows_per_s": 963.4,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 79.4,
+   "rss_peak_mb": 70.6,
+   "container_mem_peak_mb": 159.1,
+   "container_cpu_peak_pct": 4.7,
+   "total_peak_mb": 229.7,
+   "host_used_peak_gb": 26.79,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 43520,
+     "cmd": "-m engine.lanes.graph ingest",
+     "rss_mb": 65.9
+    },
+    {
+     "pid": 34848,
+     "cmd": "-m engine.lanes.graph ingest",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 25.4,
+   "pgdata_mb": 79.8,
+   "wal_mb": 1.0,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d2-ingest-crm",
+     "wall_s": 0.98,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1285,
+       "rejected_records": 50,
+       "duplicate_rows": 0,
+       "inserted": 51,
+       "updated": 99,
+       "deleted": 37,
+       "unchanged": 1085,
+       "blocked": false,
+       "vertices_created": 51
+      },
+      "seconds": {
+       "read": 0.0088,
+       "transform": 0.0971,
+       "stage": 0.0412,
+       "merge": 0.0208,
+       "log": 0.0011
+      }
+     }
+    },
+    {
+     "label": "d2-ingest-erp",
+     "wall_s": 0.97,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 1298,
+       "rejected_records": 51,
+       "duplicate_rows": 0,
+       "inserted": 51,
+       "updated": 100,
+       "deleted": 39,
+       "unchanged": 1096,
+       "blocked": false,
+       "vertices_created": 51
+      },
+      "seconds": {
+       "read": 0.01,
+       "transform": 0.097,
+       "stage": 0.0431,
+       "merge": 0.0218,
+       "log": 0.0013
+      }
+     }
+    },
+    {
+     "label": "d2-ingest-web",
+     "wall_s": 0.92,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "rows_read": 179,
+       "rejected_records": 28,
+       "duplicate_rows": 0,
+       "inserted": 51,
+       "updated": 100,
+       "deleted": 0,
+       "unchanged": 0,
+       "blocked": false,
+       "vertices_created": 51
+      },
+      "seconds": {
+       "read": 0.008,
+       "transform": 0.0578,
+       "stage": 0.029,
+       "merge": 0.0123,
+       "log": 0.0014
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "staged_files": {
+    "crm": 1,
+    "erp": 1,
+    "web": 1
+   }
+  },
+  {
+   "day": 2,
+   "phase": "reconcile",
+   "wall_s": 2.05,
+   "rows": 528,
+   "rows_per_s": 257.2,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 79.8,
+   "rss_peak_mb": 84.7,
+   "container_mem_peak_mb": 189.8,
+   "container_cpu_peak_pct": 88.8,
+   "total_peak_mb": 274.5,
+   "host_used_peak_gb": 26.74,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 7128,
+     "cmd": "-m engine.lanes.graph reconcile",
+     "rss_mb": 79.9
+    },
+    {
+     "pid": 42476,
+     "cmd": "-m engine.lanes.graph reconcile",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 26.7,
+   "pgdata_mb": 97.1,
+   "wal_mb": 1.8,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d2-reconcile",
+     "wall_s": 2.05,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "replayed": false,
+      "counts": {
+       "delta_nodes": 528,
+       "rescored_nodes": 528,
+       "pairs": 374,
+       "pairs_removed": 412,
+       "affected_nodes": 992,
+       "stagings": 642,
+       "merges": 35,
+       "splits": 123,
+       "creates": 113,
+       "retired": 59,
+       "golden_rows_written": 639,
+       "golden_changes": 8494,
+       "blocks_touched": 1209,
+       "candidate_pairs": 374,
+       "cypher_queries": 13,
+       "edges_IN_BLOCK": 575,
+       "edges_MATCH": 374,
+       "edges_MEMBER_OF": 354,
+       "edges_PUBLISHED_AS": 236,
+       "edges_REVIEW": 233,
+       "edges_deleted_IN_BLOCK": 432,
+       "edges_deleted_MATCH": 412,
+       "edges_deleted_MEMBER_OF": 277,
+       "edges_deleted_REVIEW": 102,
+       "edges_updated_MATCH": 451,
+       "golden_retired": 59,
+       "oversized_blocks_logged": 0,
+       "pairs_decided": 669,
+       "pairs_dropped": 412,
+       "survive_member_rows": 916,
+       "vertices_Block": 349,
+       "vertices_Golden": 236,
+       "vertices_Staging": 236
+      },
+      "seconds": {
+       "index": 0.0918,
+       "pairs": 0.4898,
+       "decide": 0.3793,
+       "recluster": 0.0917,
+       "survive": 0.1217,
+       "total": 1.1826
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "delta_nodes": 528
+  },
+  {
+   "day": 2,
+   "phase": "export",
+   "wall_s": 1.42,
+   "rows": null,
+   "rows_per_s": null,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 97.1,
+   "rss_peak_mb": 84.1,
+   "container_mem_peak_mb": 162.1,
+   "container_cpu_peak_pct": 39.3,
+   "total_peak_mb": 246.2,
+   "host_used_peak_gb": 26.71,
+   "disk_free_min_gb": 81.5,
+   "abort_reason": null,
+   "rss_peak_processes": [
+    {
+     "pid": 35780,
+     "cmd": "-m engine.lanes.graph export",
+     "rss_mb": 79.4
+    },
+    {
+     "pid": 47400,
+     "cmd": "-m engine.lanes.graph export",
+     "rss_mb": 4.7
+    }
+   ],
+   "pg_db_mb": 26.7,
+   "pgdata_mb": 97.1,
+   "wal_mb": 0.0,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d2-export",
+     "wall_s": 1.42,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "source_record": 4057,
+       "source_delta": 4808,
+       "reject": 237,
+       "anomaly": 0,
+       "staging": 2743,
+       "staging_event": 2813,
+       "golden_delta": 79611,
+       "golden": 2743,
+       "match_pair": 2122,
+       "review": 594,
+       "staging_member": 3905
+      },
+      "seconds": {
+       "read": 0.6105,
+       "write": 0.1169
+      }
+     }
+    }
+   ],
+   "status": "ok",
+   "export_mb": 2.5
+  }
+ ],
+ "exports": {
+  "0": "<USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\exports\\equiv-graph-2k\\day0",
+  "1": "<USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\exports\\equiv-graph-2k\\day1",
+  "2": "<USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\exports\\equiv-graph-2k\\day2"
+ },
+ "totals": {
+  "wall_s": 29.7,
+  "phases_wall_s": 20.5,
+  "total_peak_mb": 274.5,
+  "rss_peak_mb": 99.9,
+  "container_mem_peak_mb": 189.8,
+  "host_used_peak_gb": 26.79,
+  "host_used_baseline_gb": 26.63,
+  "pgdata_peak_mb": 97.1,
+  "pg_db_mb_final": 26.7,
+  "disk_free_min_gb": 81.5
+ }
+}

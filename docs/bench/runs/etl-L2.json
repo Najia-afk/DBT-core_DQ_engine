@@ -1,0 +1,744 @@
+{
+ "schema": 1,
+ "name": "etl-L2",
+ "lane": "etl",
+ "status": "ok",
+ "abort_reason": null,
+ "machine": {
+  "date": "2026-11-13T04:20:17+01:00",
+  "os": "Windows-11-10.0.26300-SP0",
+  "cpu_threads": 32,
+  "ram_gb": 63.7,
+  "python": "3.12.10",
+  "duckdb": "2.0.0",
+  "pyarrow": "26.0.1",
+  "psycopg": "3.3.6",
+  "numpy": "2.5.4",
+  "rapidfuzz": "3.14.6",
+  "dbt-core": "1.12.7",
+  "dbt-duckdb": "1.11.1",
+  "docker_server": "29.1.3",
+  "docker_vm_mem_gb": 31.2,
+  "git_head": "90af100"
+ },
+ "pg_server": "16.4 (Debian 16.4-1.pgdg120+2)",
+ "pg_image": "postgres:16.4-bookworm",
+ "config": {
+  "hash": "c0076c42fbd0",
+  "nodes": 300000,
+  "attributes": 200,
+  "sources": 3,
+  "kinds": [
+   "parquet",
+   "parquet",
+   "parquet"
+  ],
+  "snapshots": [
+   "full",
+   "full",
+   "delta"
+  ],
+  "seed": 42,
+  "deltas": [
+   {
+    "new_pct": 0.5,
+    "delete_pct": 0.2,
+    "broken_pct": 0.1,
+    "update_pct": 1.0
+   },
+   {
+    "new_pct": 0.5,
+    "delete_pct": 0.2,
+    "broken_pct": 0.1,
+    "update_pct": 5.0
+   }
+  ],
+  "days": 2,
+  "ingest_mode": "parallel",
+  "batch_rows": "config (50000)",
+  "elt_memory_limit": null,
+  "elt_threads": null,
+  "etl_workers": 8,
+  "pg_tuning": {
+   "memory": "12g",
+   "shm_size": "1g",
+   "shared_buffers": "3GB",
+   "work_mem": "64MB",
+   "maintenance_work_mem": "1GB",
+   "effective_cache_size": "8GB",
+   "max_wal_size": "16GB",
+   "min_wal_size": "2GB",
+   "checkpoint_timeout": "30min",
+   "synchronous_commit": "off",
+   "max_connections": 100
+  },
+  "limits": {
+   "min_free_disk_gb": 25.0,
+   "max_step_seconds": 5400.0,
+   "max_total_ram_gb": 28.0
+  }
+ },
+ "dataset": {
+  "key": "5724e112c91d",
+  "gen_wall_s": 18.9,
+  "gen_rss_peak_mb": 1606.7,
+  "bytes": 1066080657,
+  "rows_by_day": {
+   "0": 570748,
+   "1": 384622,
+   "2": 393432
+  },
+  "commands": [
+   "engine.core.synth generate --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d --days 0 --force --nodes 300000 --attributes 200 --sources 3 --seed 42 --referential bench --kinds parquet,parquet,parquet --snapshots full,full,delta --workers 8",
+   "engine.core.synth next-day --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d --workers 8 --update-pct 1.0 --new-pct 0.5 --delete-pct 0.2 --broken-pct 0.1 --merge-pct 5.0 --split-pct 5.0",
+   "engine.core.synth next-day --out <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d --workers 8 --update-pct 5.0 --new-pct 0.5 --delete-pct 0.2 --broken-pct 0.1 --merge-pct 5.0 --split-pct 5.0"
+  ]
+ },
+ "commands": [
+  "python -m engine.lanes.etl init --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source crm --run-id d0",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source erp --run-id d0",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source web --run-id d0",
+  "python -m engine.lanes.etl reconcile --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --run-id d0",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source crm --run-id d1",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source erp --run-id d1",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source web --run-id d1",
+  "python -m engine.lanes.etl reconcile --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --run-id d1",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source crm --run-id d2",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source erp --run-id d2",
+  "python -m engine.lanes.etl ingest --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --source web --run-id d2",
+  "python -m engine.lanes.etl reconcile --config <USER_HOME>\\AppData\\Local\\Temp\\mdm2-bench\\ds-5724e112c91d\\config.yml --run-id d2"
+ ],
+ "phases": [
+  {
+   "day": 0,
+   "phase": "init",
+   "wall_s": 0.99,
+   "rows": null,
+   "rows_per_s": null,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 45.6,
+   "rss_peak_mb": 59.8,
+   "container_mem_peak_mb": 101.1,
+   "container_cpu_peak_pct": 8.3,
+   "total_peak_mb": 160.9,
+   "host_used_peak_gb": 26.06,
+   "disk_free_min_gb": 87.0,
+   "abort_reason": null,
+   "pg_db_mb": 7.8,
+   "pgdata_mb": 46.1,
+   "wal_mb": 0.6,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-init",
+     "wall_s": 0.99,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "columns_added": 0,
+       "migrations_applied": [
+        1
+       ],
+       "schema": "mdm_bench",
+       "version": 1
+      },
+      "total_seconds": 0.311,
+      "peak_rss_mb": 67.2
+     }
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "day": 0,
+   "phase": "ingest",
+   "wall_s": 50.13,
+   "rows": 570748,
+   "rows_per_s": 11385.5,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 3241.5,
+   "rss_peak_mb": 3653.4,
+   "container_mem_peak_mb": 2829.3,
+   "container_cpu_peak_pct": 320.1,
+   "total_peak_mb": 4731.5,
+   "host_used_peak_gb": 32.84,
+   "disk_free_min_gb": 86.3,
+   "abort_reason": null,
+   "pg_db_mb": 1036.6,
+   "pgdata_mb": 2226.9,
+   "wal_mb": 1147.3,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-ingest-crm",
+     "wall_s": 50.13,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "active_keys": 0,
+       "batches": 4,
+       "blocked": false,
+       "deleted": 0,
+       "inserted": 188550,
+       "key_null": 0,
+       "reject_rows": 3675,
+       "rejected_records": 1823,
+       "retries": 0,
+       "rows_read": 190373,
+       "updated": 0,
+       "valid_records": 188550,
+       "wide_rows": 188550
+      },
+      "seconds": {
+       "extract": 0.209,
+       "merge": 23.701,
+       "stage": 11.797,
+       "transform": 12.512
+      },
+      "total_seconds": 49.353,
+      "peak_rss_mb": 1231.5
+     }
+    },
+    {
+     "label": "d0-ingest-erp",
+     "wall_s": 47.3,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "active_keys": 0,
+       "batches": 4,
+       "blocked": false,
+       "deleted": 0,
+       "inserted": 188097,
+       "key_null": 0,
+       "reject_rows": 3913,
+       "rejected_records": 1966,
+       "retries": 0,
+       "rows_read": 190063,
+       "updated": 0,
+       "valid_records": 188097,
+       "wide_rows": 188097
+      },
+      "seconds": {
+       "extract": 0.246,
+       "merge": 20.361,
+       "stage": 12.377,
+       "transform": 13.029
+      },
+      "total_seconds": 46.526,
+      "peak_rss_mb": 1294.7
+     }
+    },
+    {
+     "label": "d0-ingest-web",
+     "wall_s": 49.02,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "batches": 4,
+       "blocked": false,
+       "deleted": 0,
+       "inserted": 188255,
+       "key_null": 0,
+       "reject_rows": 4109,
+       "rejected_records": 2057,
+       "retries": 0,
+       "rows_read": 190312,
+       "updated": 0,
+       "valid_records": 188255,
+       "wide_rows": 188255
+      },
+      "seconds": {
+       "extract": 0.198,
+       "merge": 22.867,
+       "stage": 11.838,
+       "transform": 12.936
+      },
+      "total_seconds": 48.241,
+      "peak_rss_mb": 1245.6
+     }
+    }
+   ],
+   "status": "ok",
+   "staged_files": {
+    "crm": 4,
+    "erp": 4,
+    "web": 4
+   }
+  },
+  {
+   "day": 0,
+   "phase": "reconcile",
+   "wall_s": 191.47,
+   "rows": 564902,
+   "rows_per_s": 2950.3,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 8965.6,
+   "rss_peak_mb": 999.9,
+   "container_mem_peak_mb": 2766.8,
+   "container_cpu_peak_pct": 199.9,
+   "total_peak_mb": 3690.9,
+   "host_used_peak_gb": 36.87,
+   "disk_free_min_gb": 81.1,
+   "abort_reason": null,
+   "pg_db_mb": 3606.0,
+   "pgdata_mb": 8508.7,
+   "wal_mb": 3722.6,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d0-reconcile",
+     "wall_s": 191.47,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "affected_nodes": 564902,
+       "candidate_pairs": 709075,
+       "creates": 335909,
+       "delta_nodes": 564902,
+       "golden_blocked": 205165,
+       "golden_changes": 25381395,
+       "golden_rows_read": 0,
+       "golden_rows_written": 335909,
+       "member_rows_read": 0,
+       "member_rows_written": 564902,
+       "merges": 0,
+       "oversized_block_anomalies": 0,
+       "pairs_inserted": 326913,
+       "pairs_read": 276697,
+       "pairs_removed": 0,
+       "pairs_stored": 326913,
+       "pairs_updated": 0,
+       "record_rows_read_match_attrs": 1983052,
+       "record_rows_read_narrow": 564902,
+       "record_rows_read_wide": 564902,
+       "rescored_nodes": 564902,
+       "splits": 0,
+       "stagings_kept": 335909,
+       "stagings_read": 0,
+       "stagings_retired": 0,
+       "stagings_total": 0
+      },
+      "seconds": {
+       "blocks": 18.089,
+       "cluster": 5.033,
+       "decide": 3.525,
+       "read_delta": 2.287,
+       "score": 22.521,
+       "setup": 0.441,
+       "survive": 132.586,
+       "write_staging": 5.31
+      },
+      "total_seconds": 190.769,
+      "peak_rss_mb": 1047.7
+     }
+    }
+   ],
+   "status": "ok",
+   "delta_nodes": 564902
+  },
+  {
+   "day": 1,
+   "phase": "ingest",
+   "wall_s": 17.57,
+   "rows": 384622,
+   "rows_per_s": 21887.9,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 8649.5,
+   "rss_peak_mb": 2175.3,
+   "container_mem_peak_mb": 2602.0,
+   "container_cpu_peak_pct": 198.8,
+   "total_peak_mb": 4626.7,
+   "host_used_peak_gb": 38.25,
+   "disk_free_min_gb": 81.0,
+   "abort_reason": null,
+   "pg_db_mb": 3623.4,
+   "pgdata_mb": 8558.1,
+   "wal_mb": 22.7,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d1-ingest-crm",
+     "wall_s": 16.88,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "active_keys": 188550,
+       "batches": 4,
+       "blocked": false,
+       "deleted": 377,
+       "inserted": 945,
+       "key_null": 0,
+       "reject_rows": 3884,
+       "rejected_records": 2018,
+       "retries": 0,
+       "rows_read": 190944,
+       "updated": 1881,
+       "valid_records": 188926,
+       "wide_rows": 2826
+      },
+      "seconds": {
+       "extract": 0.15,
+       "merge": 1.735,
+       "stage": 1.277,
+       "transform": 12.57
+      },
+      "total_seconds": 16.079,
+      "peak_rss_mb": 1143.2
+     }
+    },
+    {
+     "label": "d1-ingest-erp",
+     "wall_s": 17.57,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "active_keys": 188097,
+       "batches": 4,
+       "blocked": false,
+       "deleted": 375,
+       "inserted": 942,
+       "key_null": 0,
+       "reject_rows": 4117,
+       "rejected_records": 2158,
+       "retries": 0,
+       "rows_read": 190633,
+       "updated": 1883,
+       "valid_records": 188475,
+       "wide_rows": 2825
+      },
+      "seconds": {
+       "extract": 0.198,
+       "merge": 1.841,
+       "stage": 1.278,
+       "transform": 13.101
+      },
+      "total_seconds": 16.768,
+      "peak_rss_mb": 1163.5
+     }
+    },
+    {
+     "label": "d1-ingest-web",
+     "wall_s": 1.81,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "batches": 1,
+       "blocked": false,
+       "deleted": 0,
+       "inserted": 944,
+       "key_null": 0,
+       "reject_rows": 255,
+       "rejected_records": 213,
+       "retries": 0,
+       "rows_read": 3045,
+       "updated": 1888,
+       "valid_records": 2832,
+       "wide_rows": 2832
+      },
+      "seconds": {
+       "extract": 0.025,
+       "merge": 0.217,
+       "stage": 0.178,
+       "transform": 0.293
+      },
+      "total_seconds": 1.094,
+      "peak_rss_mb": 143.5
+     }
+    }
+   ],
+   "status": "ok",
+   "staged_files": {
+    "crm": 4,
+    "erp": 4,
+    "web": 1
+   }
+  },
+  {
+   "day": 1,
+   "phase": "reconcile",
+   "wall_s": 8.65,
+   "rows": 9235,
+   "rows_per_s": 1067.8,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 8576.6,
+   "rss_peak_mb": 253.0,
+   "container_mem_peak_mb": 2539.5,
+   "container_cpu_peak_pct": 99.3,
+   "total_peak_mb": 2792.5,
+   "host_used_peak_gb": 36.18,
+   "disk_free_min_gb": 81.0,
+   "abort_reason": null,
+   "pg_db_mb": 3647.3,
+   "pgdata_mb": 8614.0,
+   "wal_mb": 38.6,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d1-reconcile",
+     "wall_s": 8.65,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "affected_nodes": 17550,
+       "candidate_pairs": 19172,
+       "creates": 2072,
+       "delta_nodes": 9235,
+       "golden_blocked": 6627,
+       "golden_changes": 80620,
+       "golden_rows_read": 7094,
+       "golden_rows_written": 7267,
+       "member_rows_read": 14719,
+       "member_rows_written": 4781,
+       "merges": 130,
+       "oversized_block_anomalies": 0,
+       "pairs_inserted": 8109,
+       "pairs_read": 15897,
+       "pairs_removed": 7379,
+       "pairs_stored": 8109,
+       "pairs_updated": 882,
+       "record_rows_read_match_attrs": 47579,
+       "record_rows_read_narrow": 17550,
+       "record_rows_read_wide": 16798,
+       "rescored_nodes": 9235,
+       "splits": 893,
+       "stagings_kept": 10059,
+       "stagings_read": 7424,
+       "stagings_retired": 330,
+       "stagings_total": 335909
+      },
+      "seconds": {
+       "blocks": 1.475,
+       "cluster": 0.589,
+       "decide": 1.238,
+       "read_delta": 0.091,
+       "score": 1.414,
+       "setup": 0.07,
+       "survive": 2.693,
+       "write_staging": 0.07
+      },
+      "total_seconds": 7.962,
+      "peak_rss_mb": 265.6
+     }
+    }
+   ],
+   "status": "ok",
+   "delta_nodes": 9235
+  },
+  {
+   "day": 2,
+   "phase": "ingest",
+   "wall_s": 18.6,
+   "rows": 393432,
+   "rows_per_s": 21150.3,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 8760.8,
+   "rss_peak_mb": 2285.3,
+   "container_mem_peak_mb": 2673.7,
+   "container_cpu_peak_pct": 162.3,
+   "total_peak_mb": 4868.9,
+   "host_used_peak_gb": 38.18,
+   "disk_free_min_gb": 81.0,
+   "abort_reason": null,
+   "pg_db_mb": 3702.2,
+   "pgdata_mb": 8748.9,
+   "wal_mb": 73.2,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d2-ingest-crm",
+     "wall_s": 18.03,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "active_keys": 189118,
+       "batches": 4,
+       "blocked": false,
+       "deleted": 381,
+       "inserted": 960,
+       "key_null": 0,
+       "reject_rows": 4086,
+       "rejected_records": 2220,
+       "retries": 0,
+       "rows_read": 191517,
+       "updated": 9423,
+       "valid_records": 189297,
+       "wide_rows": 10383
+      },
+      "seconds": {
+       "extract": 0.19,
+       "merge": 2.188,
+       "stage": 1.706,
+       "transform": 12.675
+      },
+      "total_seconds": 17.281,
+      "peak_rss_mb": 1131.3
+     }
+    },
+    {
+     "label": "d2-ingest-erp",
+     "wall_s": 18.6,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "active_keys": 188664,
+       "batches": 4,
+       "blocked": false,
+       "deleted": 370,
+       "inserted": 952,
+       "key_null": 0,
+       "reject_rows": 4314,
+       "rejected_records": 2350,
+       "retries": 0,
+       "rows_read": 191205,
+       "updated": 9406,
+       "valid_records": 188855,
+       "wide_rows": 10358
+      },
+      "seconds": {
+       "extract": 0.153,
+       "merge": 2.295,
+       "stage": 1.764,
+       "transform": 13.256
+      },
+      "total_seconds": 17.813,
+      "peak_rss_mb": 1198.3
+     }
+    },
+    {
+     "label": "d2-ingest-web",
+     "wall_s": 3.38,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "batches": 1,
+       "blocked": false,
+       "deleted": 0,
+       "inserted": 958,
+       "key_null": 0,
+       "reject_rows": 434,
+       "rejected_records": 311,
+       "retries": 0,
+       "rows_read": 10710,
+       "updated": 9441,
+       "valid_records": 10399,
+       "wide_rows": 10399
+      },
+      "seconds": {
+       "extract": 0.032,
+       "merge": 0.771,
+       "stage": 0.63,
+       "transform": 0.869
+      },
+      "total_seconds": 2.676,
+      "peak_rss_mb": 247.8
+     }
+    }
+   ],
+   "status": "ok",
+   "staged_files": {
+    "crm": 4,
+    "erp": 4,
+    "web": 1
+   }
+  },
+  {
+   "day": 2,
+   "phase": "reconcile",
+   "wall_s": 18.13,
+   "rows": 31891,
+   "rows_per_s": 1758.7,
+   "workdir_mb_peak": 0.0,
+   "pgdata_mb_peak": 8938.8,
+   "rss_peak_mb": 604.0,
+   "container_mem_peak_mb": 2667.5,
+   "container_cpu_peak_pct": 111.3,
+   "total_peak_mb": 3271.5,
+   "host_used_peak_gb": 36.98,
+   "disk_free_min_gb": 80.9,
+   "abort_reason": null,
+   "pg_db_mb": 3782.9,
+   "pgdata_mb": 8941.6,
+   "wal_mb": 120.2,
+   "workdir_mb": 0.0,
+   "steps": [
+    {
+     "label": "d2-reconcile",
+     "wall_s": 18.13,
+     "rc": 0,
+     "summary": {
+      "status": "ok",
+      "counts": {
+       "affected_nodes": 62293,
+       "candidate_pairs": 74195,
+       "creates": 2094,
+       "delta_nodes": 31891,
+       "golden_blocked": 19615,
+       "golden_changes": 273756,
+       "golden_rows_read": 29492,
+       "golden_rows_written": 21264,
+       "member_rows_read": 59423,
+       "member_rows_written": 7689,
+       "merges": 541,
+       "oversized_block_anomalies": 0,
+       "pairs_inserted": 32796,
+       "pairs_read": 58704,
+       "pairs_removed": 32508,
+       "pairs_stored": 32796,
+       "pairs_updated": 1708,
+       "record_rows_read_match_attrs": 180281,
+       "record_rows_read_narrow": 62293,
+       "record_rows_read_wide": 61542,
+       "rescored_nodes": 31891,
+       "splits": 2654,
+       "stagings_kept": 34240,
+       "stagings_read": 30279,
+       "stagings_retired": 787,
+       "stagings_total": 338544
+      },
+      "seconds": {
+       "blocks": 2.643,
+       "cluster": 1.085,
+       "decide": 1.415,
+       "read_delta": 0.35,
+       "score": 2.888,
+       "setup": 0.069,
+       "survive": 8.538,
+       "write_staging": 0.121
+      },
+      "total_seconds": 17.452,
+      "peak_rss_mb": 621.2
+     }
+    }
+   ],
+   "status": "ok",
+   "delta_nodes": 31891
+  }
+ ],
+ "exports": {},
+ "totals": {
+  "wall_s": 332.9,
+  "phases_wall_s": 305.5,
+  "total_peak_mb": 4868.9,
+  "rss_peak_mb": 3653.4,
+  "container_mem_peak_mb": 2829.3,
+  "host_used_peak_gb": 38.25,
+  "host_used_baseline_gb": 25.24,
+  "pgdata_peak_mb": 8965.6,
+  "pg_db_mb_final": 3782.9,
+  "disk_free_min_gb": 80.9
+ }
+}

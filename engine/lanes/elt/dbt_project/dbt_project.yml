@@ -1,0 +1,9 @@
+name: mdm_elt
+version: '1.0.0'
+config-version: 2
+profile: mdm_elt
+model-paths: ['models']
+macro-paths: ['macros']
+models:
+  mdm_elt:
+    +materialized: table

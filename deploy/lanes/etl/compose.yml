@@ -1,0 +1,66 @@
+name: mdm2-etl
+
+# Voie A « ETL classique » : PostgreSQL (état + publication) et un conteneur d'exécution du moteur.
+# Les secrets viennent de l'environnement (jamais du YAML). Exemple d'usage dans README.md.
+services:
+  pg:
+    image: postgres:16.4-bookworm
+    container_name: mdm2-etl-pg
+    environment:
+      POSTGRES_DB: mdm_state
+      POSTGRES_USER: mdm
+      POSTGRES_PASSWORD: ${MDM_ETL_PG_PASSWORD:?définir MDM_ETL_PG_PASSWORD}
+    command:
+      - postgres
+      - -c
+      - max_connections=100
+      - -c
+      - shared_buffers=1GB
+      - -c
+      - work_mem=64MB
+      - -c
+      - maintenance_work_mem=256MB
+      - -c
+      - max_wal_size=8GB
+      - -c
+      - synchronous_commit=off
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm_state"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+    ports:
+      - "127.0.0.1:${MDM_ETL_PG_PORT:-55432}:5432"
+    volumes:
+      - mdm2-etl-pgdata:/var/lib/postgresql/data
+    mem_limit: 6g
+    memswap_limit: 6g
+    shm_size: 512m
+
+  etl:
+    profiles: ["run"]
+    image: mdm2-etl-runner
+    container_name: mdm2-etl-run
+    build:
+      context: ../../..
+      dockerfile: deploy/lanes/etl/Dockerfile
+    # docker compose --profile run run --rm etl ingest --config /config/customer.yml ...
+    entrypoint: ["python", "-m", "engine.lanes.etl"]
+    environment:
+      MDM_STATE_DSN: host=pg dbname=mdm_state user=mdm password=${MDM_ETL_PG_PASSWORD:?}
+      CRM_DSN: host=pg dbname=mdm_state user=mdm password=${MDM_ETL_PG_PASSWORD:?}
+      ERP_DSN: host=pg dbname=mdm_state user=mdm password=${MDM_ETL_PG_PASSWORD:?}
+    volumes:
+      - ${MDM_ETL_CONFIG_DIR:-./config}:/config:ro
+      - ${MDM_ETL_DATA_DIR:-./data}:/data:ro
+      - ${MDM_ETL_OUT_DIR:-./out}:/out
+    depends_on:
+      pg:
+        condition: service_healthy
+    mem_limit: 6g
+    memswap_limit: 6g
+    shm_size: 512m
+
+volumes:
+  mdm2-etl-pgdata:
+    name: mdm2-etl-pgdata

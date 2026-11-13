@@ -1,0 +1,63 @@
+name: mdm2-engine
+
+services:
+  meta:
+    image: postgres:16.4-bookworm
+    mem_limit: 1g
+    memswap_limit: 1g
+    environment:
+      POSTGRES_USER: mdm
+      POSTGRES_DB: mdm
+      POSTGRES_PASSWORD: ${MDM_DB_PASSWORD:?Set MDM_DB_PASSWORD}
+    volumes:
+      - meta:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  state:
+    image: postgres:16.4-bookworm
+    mem_limit: 8g
+    memswap_limit: 8g
+    shm_size: 512m
+    command: ["postgres", "-c", "shared_buffers=1GB", "-c", "work_mem=32MB"]
+    environment:
+      POSTGRES_USER: mdm
+      POSTGRES_DB: mdm
+      POSTGRES_PASSWORD: ${MDM_DB_PASSWORD:?Set MDM_DB_PASSWORD}
+    volumes:
+      - state:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  worker:
+    build:
+      context: ..
+      target: final
+    image: mdm2-engine:local
+    mem_limit: 8g
+    memswap_limit: 8g
+    cpus: 4
+    command: ["python", "-m", "engine.runtime", "worker"]
+    environment:
+      MDM_META_DSN: postgresql://mdm:${MDM_DB_PASSWORD}@meta:5432/mdm
+      MDM_STATE_DSN: postgresql://mdm:${MDM_DB_PASSWORD}@state:5432/mdm
+      CRM_DSN: postgresql://mdm:${MDM_DB_PASSWORD}@state:5432/mdm
+      ERP_DSN: postgresql://mdm:${MDM_DB_PASSWORD}@state:5432/mdm
+      MDM_RUNTIME_CONFIG: /cfg/runtime.yml
+    volumes:
+      - ../configs:/cfg:ro
+      - work:/work
+      - data:/data
+    depends_on:
+      meta: {condition: service_healthy}
+      state: {condition: service_healthy}
+
+volumes:
+  meta:
+  state:
+  work:
+  data:

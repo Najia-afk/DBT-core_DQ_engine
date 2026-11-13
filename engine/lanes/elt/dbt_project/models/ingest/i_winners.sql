@@ -1,0 +1,1 @@
+select _ord, source_key, rev from {{ ref('i_ranked') }} where rn = 1

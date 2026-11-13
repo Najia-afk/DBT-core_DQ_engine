@@ -1,0 +1,22 @@
+host:
+  ram_gib: 16
+  job_memory_budget_mib: 6144
+  max_running_steps: 2
+  max_threads: 4
+  max_queued_runs: 200
+  min_free_disk_gib: 25
+  work_dir: /work
+profiles:
+  small: {process_memory_mib: 2048, duckdb_memory_mib: 1024, threads: 1}
+  medium: {process_memory_mib: 3072, duckdb_memory_mib: 1536, threads: 2}
+  large: {process_memory_mib: 6144, duckdb_memory_mib: 4096, threads: 4}
+referential:
+  max_running_steps: 2
+lane:
+  python: python
+  cwd: /work
+  env:
+    MDM_ELT_WORKDIR: /work/elt
+    MDM_ELT_MEMORY_LIMIT: 1536MB
+    MDM_ELT_THREADS: "2"
+    MDM_ETL_WORKERS: "2"

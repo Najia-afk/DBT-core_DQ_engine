@@ -1,0 +1,116 @@
+{
+ "step": "L1",
+ "nodes": 100000,
+ "runs": {},
+ "pairs": {
+  "etl-vs-elt": {
+   "ok": true,
+   "totals": {},
+   "details": [],
+   "seconds": 10.4,
+   "rss_peak_mb": 1914.5,
+   "error": null,
+   "compared": {
+    "source_record": [
+     192438,
+     192438
+    ],
+    "match_pair": [
+     111562,
+     111562
+    ],
+    "staging": [
+     118206,
+     118206
+    ],
+    "staging_member": [
+     191679,
+     191679
+    ],
+    "golden": [
+     118206,
+     118206
+    ],
+    "review": [
+     22093,
+     22093
+    ],
+    "source_delta": [
+     242668,
+     242668
+    ],
+    "staging_event": [
+     119173,
+     119173
+    ],
+    "golden_delta": [
+     2280342,
+     2280342
+    ],
+    "reject": [
+     3258,
+     3258
+    ],
+    "anomaly": [
+     98580,
+     98580
+    ]
+   }
+  },
+  "etl-vs-elt+row_hash": {
+   "ok": true,
+   "totals": {},
+   "details": [],
+   "seconds": 11.1,
+   "rss_peak_mb": 1923.4,
+   "error": null,
+   "compared": {
+    "source_record": [
+     192438,
+     192438
+    ],
+    "match_pair": [
+     111562,
+     111562
+    ],
+    "staging": [
+     118206,
+     118206
+    ],
+    "staging_member": [
+     191679,
+     191679
+    ],
+    "golden": [
+     118206,
+     118206
+    ],
+    "review": [
+     22093,
+     22093
+    ],
+    "source_delta": [
+     242668,
+     242668
+    ],
+    "staging_event": [
+     119173,
+     119173
+    ],
+    "golden_delta": [
+     2280342,
+     2280342
+    ],
+    "reject": [
+     3258,
+     3258
+    ],
+    "anomaly": [
+     98580,
+     98580
+    ]
+   }
+  }
+ },
+ "attributes": 50
+}

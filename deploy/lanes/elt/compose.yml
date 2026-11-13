@@ -1,0 +1,50 @@
+name: mdm2-elt
+
+# État/publication PostgreSQL de la voie ELT et conteneur d'exécution de la CLI. Chaque conteneur est
+# plafonné (6 Go mémoire + swap, 512 Mo de shm) ; les noms sont préfixés `mdm2-elt-`.
+services:
+  postgres:
+    image: postgres:16.4-bookworm
+    container_name: mdm2-elt-pg
+    environment:
+      POSTGRES_DB: mdm
+      POSTGRES_USER: mdm
+      POSTGRES_PASSWORD: "${MDM_ELT_DB_PASSWORD:?définir MDM_ELT_DB_PASSWORD}"
+    command: ["-c", "shared_buffers=1GB", "-c", "max_wal_size=4GB", "-c", "max_connections=60"]
+    ports:
+      - "127.0.0.1:${MDM_ELT_PG_PORT:-55460}:5432"
+    mem_limit: 6g
+    memswap_limit: 6g
+    shm_size: 512m
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  elt:
+    profiles: ["run"]
+    container_name: mdm2-elt-run
+    build:
+      context: ../../..
+      dockerfile: deploy/lanes/elt/Dockerfile
+    environment:
+      MDM_STATE_DSN: "postgresql://mdm:${MDM_ELT_DB_PASSWORD}@postgres:5432/mdm"
+      MDM_ELT_MEMORY_LIMIT: "${MDM_ELT_MEMORY_LIMIT:-4GB}"
+      MDM_ELT_THREADS: "${MDM_ELT_THREADS:-4}"
+    working_dir: /workspace
+    volumes:
+      - ../../..:/workspace:ro
+      - elt-work:/work
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 6g
+    memswap_limit: 6g
+    shm_size: 512m
+
+volumes:
+  pgdata:
+  elt-work:

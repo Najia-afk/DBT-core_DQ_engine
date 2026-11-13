@@ -1,0 +1,79 @@
+# Exemple de référentiel. L'ordre de `sources` dans chaque attribut = priorité de survie.
+referential: customer
+version: 1
+
+state:
+  dsn_env: MDM_STATE_DSN
+  schema: mdm_customer
+
+sources:
+  - {id: crm, kind: postgres, location: public.crm_customers, dsn_env: CRM_DSN,
+     key: customer_id, revision: updated_at, snapshot: full}
+  - {id: erp, kind: postgres, location: public.erp_clients, dsn_env: ERP_DSN,
+     key: client_no, revision: modified_at, snapshot: full}
+  - {id: web, kind: parquet, location: /data/web/customers/*.parquet,
+     key: account_id, revision: event_ts, snapshot: delta}
+
+attributes:
+  - name: last_name
+    nullable: false
+    normalize: [trim, lower, strip_accents, collapse_spaces]
+    sources: [{source: crm, column: LASTNAME}, {source: erp, column: nom}, {source: web, column: surname}]
+    checks:
+      - {rule: max_length, value: 120, on_fail: reject_record}
+
+  - name: first_name
+    normalize: [trim, lower, strip_accents]
+    sources: [{source: crm, column: FIRSTNAME}, {source: erp, column: prenom}, {source: web, column: given_name}]
+
+  - name: birth_date
+    type: date
+    sources: [{source: crm, column: BIRTHDATE}, {source: erp, column: date_naissance}]
+
+  - name: email
+    normalize: [trim, lower]
+    sources: [{source: web, column: email}, {source: crm, column: EMAIL}]
+    strategy: most_recent
+    checks:
+      - {rule: regex, value: '^[^@\s]+@[^@\s]+\.[^@\s]+$', on_fail: null_value}
+
+  - name: country
+    normalize: [trim, upper]
+    nullable: false
+    sources: [{source: crm, column: COUNTRY}, {source: erp, column: pays}]
+    checks:
+      - {rule: in_set, value: [FR, BE, DE, ES, IT, GB], on_fail: warn}
+
+  - name: credit_limit
+    type: decimal
+    sources: [{source: erp, column: plafond}]
+    checks:
+      - {rule: min, value: 0, on_fail: reject_record}
+
+matching:
+  version: customer-match-1
+  blocking:
+    - name: ln_year
+      parts: [{attr: last_name, transform: prefix, n: 4}, {attr: birth_date, transform: year}]
+    - name: email
+      parts: [{attr: email}]
+  max_block_size: 500
+  comparators:
+    - {attr: last_name, method: levenshtein, weight: 0.4}
+    - {attr: first_name, method: levenshtein, weight: 0.3}
+    - {attr: birth_date, method: exact, weight: 0.2}
+    - {attr: email, method: exact, weight: 0.1}
+  contradictions:
+    - {attr: birth_date}
+  accept: 0.95
+  review: 0.80
+  min_evidence: 0.5
+
+publication:
+  provenance: true
+
+runtime:
+  profile: medium
+  batch_rows: 50000
+  max_attempts: 3
+  step_timeout_minutes: 120
